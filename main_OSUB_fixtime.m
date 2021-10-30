@@ -4,21 +4,37 @@ addpath('Algs')
 addpath('Funcs')
 addpath('OSUB')
 
-setup = 'sim1';
+setup = 'sim1-2';
 
 T = 10e3;               % Time horizon
 Num_Trials = 100; 
 
 switch setup
-    case 'sim1'
 %% One dim problem
+    case 'sim1-1'
 AvgThruput{1} = [0.1:0.1:0.9 0.8:-0.1:0.1];    %K=17
 AvgThruput{2} = [0.1:0.04:0.9 0.86:-0.04:0.1];    %K=41
 AvgThruput{3} = [0.1:0.02:0.9 0.88:-0.02:0.1];    %K=81
 AvgThruput{4} = [0.1:0.016:0.9 0.884:-0.016:0.1];    %K=101
 AvgThruput{5} = [0.1:0.0125:0.9 0.8875:-0.0125:0.1];  %K=129
-    case 'sim2-1'
+%% One dim problem 2
+    case 'sim1-2'
+AvgThruput{1} = [0.1:0.1:0.9 0.8:-0.1:0.1];    %K=17
+AvgThruput{2} = repelem(AvgThruput{1},2);    %K=33
+temp=find(AvgThruput{2}==0.9); temp(1)=[];
+AvgThruput{2}(temp) =[]; 
+AvgThruput{3} = repelem(AvgThruput{2},2);    %K=65
+temp=find(AvgThruput{3}==0.9); temp(1)=[];
+AvgThruput{3}(temp) =[]; 
+AvgThruput{4} = repelem(AvgThruput{2},3);    %K=97
+temp=find(AvgThruput{4}==0.9); temp(1)=[];
+AvgThruput{4}(temp) =[]; 
+AvgThruput{5} = repelem(AvgThruput{2},4);    %K=129
+temp=find(AvgThruput{5}==0.9); temp(1)=[];
+AvgThruput{5}(temp) =[]; clear temp
+    
 %% 2-dim problem increase #rates
+    case 'sim2-1'
 % i=3, k=9
 Rate{1} = [3 5 6]; 
 PredProb{1} = [0.3 0.5 0.65];
@@ -50,8 +66,9 @@ TranProbr{4} = [0.99 0.8 0.6 0.4 0.2 0.15 0.1 0.05 0.03 0.01];
 Beam{4} = [1 2 3 4 5 6 7 8 9];
 TranProbb{4} = [0.1:0.2:0.9 0.7:-0.2:0.1];
 AvgThruput{4} = (PredProb{4}.*TranProbr{4})'.*TranProbb{4};
-    case 'sim2-2'
+    
 %% 2-dim problem increase #beams
+    case 'sim2-2'
 % i=5, k=5
 Rate{1} = [2 3 5 6 9]; 
 PredProb{1} = [0.1 0.3 0.5 0.65 0.9];
@@ -114,14 +131,14 @@ U_UCB_timer = [];
         disp(trial)
 
         %% 1-dim OSUB
-        [~, U_KL_reg, KL_areg, U_KL_Arm, timer1] = OSUB(AvgThruput{e}, 2, T, "KLUCB");  
-        [~, U_UCB_reg, UCB_areg, U_UCB_Arm, timer2] = OSUB(AvgThruput{e}, 2, T, "UCB");
-        [~, U_TS_reg, TS_areg, U_TS_Arm, timer3] = OSUB(AvgThruput{e}, 2, T, "TS");
+        %[~, KL_reg, KL_areg, KL_Arm, timer1] = OSUB(AvgThruput{e}, 2, T, "KLUCB");  
+        %[~, UCB_reg, UCB_areg, UCB_Arm, timer2] = OSUB(AvgThruput{e}, 2, T, "UCB");
+        %[~, TS_reg, TS_areg, TS_Arm, timer3] = OSUB(AvgThruput{e}, 2, T, "TS");
 
         %% 1-dim Classic algs
-        %[~, U_KL_reg, U_KL_Arm, timer1] = KLUCB(AvgThruput{e}, T);  
-        %[~, U_UCB_reg, U_UCB_Arm, timer2] = UCB(AvgThruput{e}, T);
-        %[~, U_TS_reg, U_TS_Arm, timer3] = ThompsonSampling(AvgThruput{e}, T);
+        [~, KL_reg, KL_areg, KL_Arm, timer1] = Classic(AvgThruput{e}, T, "KLUCB");  
+        [~, UCB_reg, UCB_areg, UCB_Arm, timer2] = Classic(AvgThruput{e}, T, "UCB");
+        [~, TS_reg, TS_areg, TS_Arm, timer3] = Classic(AvgThruput{e}, T, "TS");
 
         %% 2-dim OSUB
         %[~, U_TS_reg, TS_areg, U_TS_Arm, timer1] = OSUB_TwoDim(PredProb{e}, TranProbr{e}, TranProbb{e}, 4, T, "TS");
@@ -134,17 +151,17 @@ U_UCB_timer = [];
         %[~, UCB_regret, ~, U_UCB_Arm, timer3] = Classic_2dim(PredProb{e}, TranProbr{e}, TranProbb{e}, T, "UCB");
         
         %% Update records
-        U_KL_SelectedArms       = [U_KL_SelectedArms; U_KL_Arm];
-        U_UCB_SelectedArms       = [U_UCB_SelectedArms; U_UCB_Arm];
-        U_TS_SelectedArms       = [U_TS_SelectedArms; U_TS_Arm];
+        U_KL_SelectedArms       = [U_KL_SelectedArms; KL_Arm];
+        U_UCB_SelectedArms       = [U_UCB_SelectedArms; UCB_Arm];
+        U_TS_SelectedArms       = [U_TS_SelectedArms; TS_Arm];
 
        % U_KL_reward       = [U_KL_reward; U_KL_X];
        % U_UCB_reward       = [U_UCB_reward; U_UCB_X];
        % U_TS_reward       = [U_TS_reward; U_TS_X];
 
-        U_KL_regret{e}       = [U_KL_regret{e}; U_KL_reg];
-        U_UCB_regret{e}       = [U_UCB_regret{e}; U_UCB_reg];
-        U_TS_regret{e}       = [U_TS_regret{e}; U_TS_reg];
+        U_KL_regret{e}       = [U_KL_regret{e}; KL_reg];
+        U_UCB_regret{e}       = [U_UCB_regret{e}; UCB_reg];
+        U_TS_regret{e}       = [U_TS_regret{e}; TS_reg];
 
         %U_KL_mu_exp = (U_KL_mu + U_KL_mu_exp*(trial-1))/trial;
         %U_UCB_mu_exp = (U_UCB_mu + U_UCB_mu_exp*(trial-1))/trial;

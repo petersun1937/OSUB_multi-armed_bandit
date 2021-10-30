@@ -1,6 +1,6 @@
 function PlotRegret3(regret1,regret2,regret3,std1,std2,std3,CI95_1,CI95_2,CI95_3,Alg1,Alg2,Alg3)
 T = size(regret1,2);
-
+%{
 figure
 plot(mean(regret1,1),'k', 'LineWidth',1.5);
 hold on
@@ -10,7 +10,7 @@ grid on
 xlabel('Time slot')
 ylabel('Cumulative regret')
 legend(Alg1,Alg2,Alg3)
-
+%}
 %{
 % Plot Standard Deviation of all experiments
 figure
