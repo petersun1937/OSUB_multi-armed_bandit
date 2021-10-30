@@ -30,6 +30,17 @@ switch setup
         TranProbb = [0.1:0.2:0.9 0.7:-0.2:0.1];
         
         AvgThruput = (PredProb.*TranProbr)'.*TranProbb;
+    case 'sim4'
+       % 4nd setup (vertically not unimodal)
+        Rate = [2 3 5 6 9]; 
+        
+        PredProb = [0.1 0.2 0.3 0.4 0.5];
+        TranProbr = [0.5 0.4 0.25 0.2 0.1];
+        
+        Beam = [1 2 3 4 5 6 7 8 9];
+        TranProbb = [0.1:0.2:0.9 0.7:-0.2:0.1];
+        
+        AvgThruput = (PredProb.*TranProbr)'.*TranProbb;
 end
 
 %AvgThruput = Rate.*PredProb.*TranProb;  
