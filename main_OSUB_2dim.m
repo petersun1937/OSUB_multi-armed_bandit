@@ -1,10 +1,10 @@
 clear
 addpath('Algs')
 addpath('Funcs')
-addpath('OSUB')
+addpath('Utilities')
 
 %% Sim Setup
-setup = 'sim3';
+setup = 'sim4';
 
 switch setup
     case 'sim1'
@@ -32,10 +32,10 @@ switch setup
         AvgThruput = (PredProb.*TranProbr)'.*TranProbb;
     case 'sim4'
        % 4nd setup (vertically not unimodal)
-        Rate = [2 3 5 6 9]; 
+        Rate = [2 3 5 6 8]; 
         
-        PredProb = [0.1 0.2 0.3 0.4 0.5];
-        TranProbr = [0.5 0.4 0.25 0.2 0.1];
+        PredProb = [0.15 0.3 0.45 0.6 0.75];
+        TranProbr = [0.99 0.8 0.5 0.4 0.2];
         
         Beam = [1 2 3 4 5 6 7 8 9];
         TranProbb = [0.1:0.2:0.9 0.7:-0.2:0.1];
@@ -47,15 +47,15 @@ end
 AvgThruputr = PredProb.*TranProbr; 
 AvgThruputb = TranProbb; 
 
-T = 5e3;               % Time horizon
-Num_Trials = 30;
+T = 10e3;               % Time horizon
+Num_Trials = 100;
 
 %% Initialization
 KL_SelectedArms       = [];   UCB_SelectedArms       = [];
 TS_SelectedArms       = [];
 
-%U_KL_reward       = [];   U_UCB_reward       = [];
-%U_TS_reward       = [];
+KL_reward       = [];   UCB_reward       = [];
+TS_reward       = [];
 
 KL_timer = [];        TS_timer = [];   
 UCB_timer = [];  
@@ -71,23 +71,23 @@ for trial = 1:Num_Trials
     disp(trial)
 
     %% OSUB
-    %[~, TS_reg, ~, TS_Arm, timer1] = OSUB_TwoDim(PredProb, TranProbr, TranProbb, 4, T, "TS");
-    %[~, KL_reg, ~, KL_Arm, timer2] = OSUB_TwoDim(PredProb, TranProbr, TranProbb, 4, T, "KLUCB");  
-    %[~, UCB_reg, ~, UCB_Arm, timer3] = OSUB_TwoDim(PredProb, TranProbr, TranProbb, 4, T, "UCB");
+    [TS_X, TS_reg, TS_areg, TS_Arm, timer1] = OSUB_TwoDim(PredProb, TranProbr, TranProbb, 4, T, "TS");
+    [KL_X, KL_reg, KL_areg, KL_Arm, timer2] = OSUB_TwoDim(PredProb, TranProbr, TranProbb, 4, T, "KLUCB");  
+    [UCB_X, UCB_reg, UCB_areg, UCB_Arm, timer3] = OSUB_TwoDim(PredProb, TranProbr, TranProbb, 4, T, "UCB");
     
     %% Classic
-    [~, TS_reg, TS_Arm, timer1] = Classic_2dim(PredProb, TranProbr, TranProbb, T, "TS");
-    [~, KL_reg, KL_Arm, timer2] = Classic_2dim(PredProb, TranProbr, TranProbb, T, "KLUCB");  
-    [~, UCB_reg, UCB_Arm, timer3] = Classic_2dim(PredProb, TranProbr, TranProbb, T, "UCB");
-    
+    %[TS_X, TS_reg, TS_areg, TS_Arm, timer1] = Classic_2dim(PredProb, TranProbr, TranProbb, T, "TS");
+    %[KL_X, KL_reg, KL_areg, KL_Arm, timer2] = Classic_2dim(PredProb, TranProbr, TranProbb, T, "KLUCB");  
+    %[UCB_X, UCB_reg, UCB_areg, UCB_Arm, timer3] = Classic_2dim(PredProb, TranProbr, TranProbb, T, "UCB");
+   
     %% Update records
     KL_SelectedArms       = [KL_SelectedArms; KL_Arm];
     UCB_SelectedArms       = [UCB_SelectedArms; UCB_Arm];
     TS_SelectedArms       = [TS_SelectedArms; TS_Arm];
     
-   % U_KL_reward       = [U_KL_reward; U_KL_X];
-   % U_UCB_reward       = [U_UCB_reward; U_UCB_X];
-   % U_TS_reward       = [U_TS_reward; U_TS_X];
+    KL_reward       = [KL_reward; KL_X];
+    UCB_reward       = [UCB_reward; UCB_X];
+    TS_reward       = [TS_reward; TS_X];
     
     KL_regret       = [KL_regret; KL_reg];
     UCB_regret       = [UCB_regret; UCB_reg];

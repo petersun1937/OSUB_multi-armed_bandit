@@ -2,7 +2,7 @@ clear
 
 addpath('Algs')
 addpath('Funcs')
-addpath('OSUB')
+addpath('Utilities')
 
 setup = 'sim1-2';
 
@@ -104,12 +104,12 @@ end
 
 %AvgThruput = normpdf(-2:0.05:4, 1, 1)*2;     %K=121, normal dist.
 
-U_KL_fixregret = cell(5,1);   U_UCB_fixregret = cell(5,1);
-U_TS_fixregret = cell(5,1);
+KL_fixregret = cell(5,1);   UCB_fixregret = cell(5,1);
+TS_fixregret = cell(5,1);
 NumArms = [];
 
-U_KL_regret = cell(5,1);   U_UCB_regret = cell(5,1);
-U_TS_regret = cell(5,1);
+KL_regret = cell(5,1);   UCB_regret = cell(5,1);
+TS_regret = cell(5,1);
 
 %%
 for e=1:length(AvgThruput)
@@ -159,9 +159,9 @@ U_UCB_timer = [];
        % U_UCB_reward       = [U_UCB_reward; U_UCB_X];
        % U_TS_reward       = [U_TS_reward; U_TS_X];
 
-        U_KL_regret{e}       = [U_KL_regret{e}; KL_reg];
-        U_UCB_regret{e}       = [U_UCB_regret{e}; UCB_reg];
-        U_TS_regret{e}       = [U_TS_regret{e}; TS_reg];
+        KL_regret{e}       = [KL_regret{e}; KL_reg];
+        UCB_regret{e}       = [UCB_regret{e}; UCB_reg];
+        TS_regret{e}       = [TS_regret{e}; TS_reg];
 
         %U_KL_mu_exp = (U_KL_mu + U_KL_mu_exp*(trial-1))/trial;
         %U_UCB_mu_exp = (U_UCB_mu + U_UCB_mu_exp*(trial-1))/trial;
@@ -172,15 +172,15 @@ U_UCB_timer = [];
         U_UCB_timer = [U_UCB_timer; timer2];
         U_TS_timer = [U_TS_timer; timer3];
 
-        U_KL_fixregret{e} = [U_KL_fixregret{e} KL_areg(T)];
-        U_UCB_fixregret{e} = [U_UCB_fixregret{e} UCB_areg(T)];
-        U_TS_fixregret{e} = [U_TS_fixregret{e} TS_areg(T)];
+        KL_fixregret{e} = [KL_fixregret{e} KL_areg(T)];
+        UCB_fixregret{e} = [UCB_fixregret{e} UCB_areg(T)];
+        TS_fixregret{e} = [TS_fixregret{e} TS_areg(T)];
     end
     NumArms = [NumArms numel(AvgThruput{e})];
     
-    [cumreg_U_UCB, std_U_UCB, CI95_U_UCB] = RegretAnalysis(AvgThruput{e}, U_UCB_regret{e}, Num_Trials);
-    [cumreg_U_KL, std_U_KL, CI95_U_KL] = RegretAnalysis(AvgThruput{e}, U_KL_regret{e}, Num_Trials);
-    [cumreg_U_TS, std_U_TS, CI95_U_TS] = RegretAnalysis(AvgThruput{e}, U_TS_regret{e}, Num_Trials);
+    [cumreg_U_UCB, std_U_UCB, CI95_U_UCB] = RegretAnalysis(AvgThruput{e}, UCB_regret{e}, Num_Trials);
+    [cumreg_U_KL, std_U_KL, CI95_U_KL] = RegretAnalysis(AvgThruput{e}, KL_regret{e}, Num_Trials);
+    [cumreg_U_TS, std_U_TS, CI95_U_TS] = RegretAnalysis(AvgThruput{e}, TS_regret{e}, Num_Trials);
 
     %save("UCB_result.mat")
 
@@ -190,19 +190,27 @@ U_UCB_timer = [];
     PlotRegret3(cumreg_U_UCB,cumreg_U_KL,cumreg_U_TS,std_U_UCB,std_U_KL,std_U_TS,...
         CI95_U_UCB,CI95_U_KL,CI95_U_TS,"UCB","KL-UCB","Thompson Sampling")
     drawnow
+    
+
 end
 
-U_KL_fixregret = mean(cell2mat(U_KL_fixregret),2);   U_UCB_fixregret = mean(cell2mat(U_UCB_fixregret),2);
-U_TS_fixregret =  mean(cell2mat(U_TS_fixregret),2);
+KL_fixregret = mean(cell2mat(KL_fixregret),2);   UCB_fixregret = mean(cell2mat(UCB_fixregret),2);
+TS_fixregret =  mean(cell2mat(TS_fixregret),2);
+
+%KL_fixregret = [];   TS_fixregret = [];   UCB_fixregret = [];
+%for e=1:length(AvgThruput)
+%    KL_fixregret = [KL_fixregret mean(KL_regret{e}(:,T),1)];   UCB_fixregret = [UCB_fixregret mean(UCB_regret{e}(:,T),1)];
+%    TS_fixregret =  [TS_fixregret mean(TS_regret{e}(:,T),1)];
+%end
 
 %NumArms = [numel(AvgThruput{1}) numel(AvgThruput{2}) numel(AvgThruput{3}) numel(AvgThruput{4})];
 %% Compute and plot regret and statistics
 
 figure
-plot(NumArms, U_UCB_fixregret,'k', 'LineWidth',1.5);
+plot(NumArms, UCB_fixregret,'k', 'LineWidth',1.5);
 hold on
-plot(NumArms,U_KL_fixregret,'r', 'LineWidth',1.5);
-plot(NumArms,U_TS_fixregret,'b', 'LineWidth',1.5);
+plot(NumArms,KL_fixregret,'r', 'LineWidth',1.5);
+plot(NumArms,TS_fixregret,'b', 'LineWidth',1.5);
 grid on
 xlabel('Number of arms')
 ylabel("Regret at time slot "+num2str(T))

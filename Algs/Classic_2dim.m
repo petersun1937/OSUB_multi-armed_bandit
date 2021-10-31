@@ -1,4 +1,4 @@
-function [reward, asympregret, k, timer] = Classic_2dim(Env1_1, Env1_2, Env2, Time, alg)
+function [reward, regret, asympregret, k, timer] = Classic_2dim(Env1_1, Env1_2, Env2, Time, alg)
     % HF: horizon free
         K1 = length(Env1_1);    K2 = length(Env2);
         L = zeros(Time,2);  %L(1) = randi(K);
