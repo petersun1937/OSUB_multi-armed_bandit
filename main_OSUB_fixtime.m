@@ -32,6 +32,19 @@ AvgThruput{4}(temp) =[];
 AvgThruput{5} = repelem(AvgThruput{2},4);    %K=129
 temp=find(AvgThruput{5}==0.9); temp(1)=[];
 AvgThruput{5}(temp) =[]; clear temp
+
+%% One dim problem 2
+    case 'sim1-3'
+AvgThruput{1} = [0.1:0.1:0.9 0.8:-0.1:0.1];    %K=17
+thetatemp = [0.1:0.1:0.7 0.7:-0.1:0.1];
+AvgThruput{2} = repelem(thetatemp,2);  k=length(AvgThruput{2})/2;  %K=31
+AvgThruput{2} = [AvgThruput{2}(1:k) 0.8 0.9 0.8 AvgThruput{2}(k+1:k*2)];
+AvgThruput{3} = repelem(thetatemp,4);  k=length(AvgThruput{3})/2;    %K=59
+AvgThruput{3} = [AvgThruput{3}(1:k) 0.8 0.9 0.8 AvgThruput{3}(k+1:k*2)];
+AvgThruput{4} = repelem(thetatemp,6);  k=length(AvgThruput{4})/2;    %K=87
+AvgThruput{4} = [AvgThruput{4}(1:k) 0.8 0.9 0.8 AvgThruput{4}(k+1:k*2)];
+AvgThruput{5} = repelem(thetatemp,8);  k=length(AvgThruput{5})/2;    %K=115
+AvgThruput{5} = [AvgThruput{5}(1:k) 0.8 0.9 0.8 AvgThruput{5}(k+1:k*2)];
     
 %% 2-dim problem increase #rates
     case 'sim2-1'
