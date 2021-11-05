@@ -4,10 +4,10 @@ addpath('Algs')
 addpath('Funcs')
 addpath('Utilities')
 
-setup = 'sim1-2';
+setup = 'sim1-3';
 
 T = 10e3;               % Time horizon
-Num_Trials = 100; 
+Num_Trials = 1000; 
 
 switch setup
 %% One dim problem
@@ -17,7 +17,7 @@ AvgThruput{2} = [0.1:0.04:0.9 0.86:-0.04:0.1];    %K=41
 AvgThruput{3} = [0.1:0.02:0.9 0.88:-0.02:0.1];    %K=81
 AvgThruput{4} = [0.1:0.016:0.9 0.884:-0.016:0.1];    %K=101
 AvgThruput{5} = [0.1:0.0125:0.9 0.8875:-0.0125:0.1];  %K=129
-%% One dim problem 2
+%% One dim problem 2 (repeat suboptimal)
     case 'sim1-2'
 AvgThruput{1} = [0.1:0.1:0.9 0.8:-0.1:0.1];    %K=17
 AvgThruput{2} = repelem(AvgThruput{1},2);    %K=33
@@ -33,7 +33,7 @@ AvgThruput{5} = repelem(AvgThruput{2},4);    %K=129
 temp=find(AvgThruput{5}==0.9); temp(1)=[];
 AvgThruput{5}(temp) =[]; clear temp
 
-%% One dim problem 2
+%% One dim problem 2 (repeat suboptimal except neighbors of optimal)
     case 'sim1-3'
 AvgThruput{1} = [0.1:0.1:0.9 0.8:-0.1:0.1];    %K=17
 thetatemp = [0.1:0.1:0.7 0.7:-0.1:0.1];
@@ -125,7 +125,7 @@ KL_regret = cell(5,1);   UCB_regret = cell(5,1);
 TS_regret = cell(5,1);
 
 %%
-for e=1:length(AvgThruput)
+for e=5:length(AvgThruput)
 
 disp("e")
 disp(e)
@@ -144,14 +144,14 @@ U_UCB_timer = [];
         disp(trial)
 
         %% 1-dim OSUB
-        %[~, KL_reg, KL_areg, KL_Arm, timer1] = OSUB(AvgThruput{e}, 2, T, "KLUCB");  
-        %[~, UCB_reg, UCB_areg, UCB_Arm, timer2] = OSUB(AvgThruput{e}, 2, T, "UCB");
-        %[~, TS_reg, TS_areg, TS_Arm, timer3] = OSUB(AvgThruput{e}, 2, T, "TS");
+        [~, KL_reg, KL_areg, KL_Arm, timer1] = OSUB(AvgThruput{e}, 2, T, "KLUCB");  
+        [~, UCB_reg, UCB_areg, UCB_Arm, timer2] = OSUB(AvgThruput{e}, 2, T, "UCB");
+        [~, TS_reg, TS_areg, TS_Arm, timer3] = OSUB(AvgThruput{e}, 2, T, "TS");
 
         %% 1-dim Classic algs
-        [~, KL_reg, KL_areg, KL_Arm, timer1] = Classic(AvgThruput{e}, T, "KLUCB");  
-        [~, UCB_reg, UCB_areg, UCB_Arm, timer2] = Classic(AvgThruput{e}, T, "UCB");
-        [~, TS_reg, TS_areg, TS_Arm, timer3] = Classic(AvgThruput{e}, T, "TS");
+        %[~, KL_reg, KL_areg, KL_Arm, timer1] = Classic(AvgThruput{e}, T, "KLUCB");  
+        %[~, UCB_reg, UCB_areg, UCB_Arm, timer2] = Classic(AvgThruput{e}, T, "UCB");
+        %[~, TS_reg, TS_areg, TS_Arm, timer3] = Classic(AvgThruput{e}, T, "TS");
 
         %% 2-dim OSUB
         %[~, U_TS_reg, TS_areg, U_TS_Arm, timer1] = OSUB_TwoDim(PredProb{e}, TranProbr{e}, TranProbb{e}, 4, T, "TS");
