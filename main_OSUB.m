@@ -15,7 +15,7 @@ AvgThruput = [0.1:0.1:0.9 0.8:-0.1:0.1];    %K=17
 %AvgThruput = normpdf(-2:0.05:4, 1, 1)*2;     %K=121, normal dist.
 
 T = 10e3;               % Time horizon
-Num_Trials = 100; 
+Num_Trials = 500; 
 
 %fixed_arm = length(AvgThruput)/2 + 1;
 
