@@ -2,7 +2,7 @@ clear
 
 addpath('Algs')
 addpath('Funcs')
-addpath('OSUB')
+addpath('Utilities')
 
 %% Inputs and parameters
 
@@ -15,7 +15,7 @@ AvgThruput = [0.1:0.1:0.9 0.8:-0.1:0.1];    %K=17
 %AvgThruput = normpdf(-2:0.05:4, 1, 1)*2;     %K=121, normal dist.
 
 T = 5e3;               % Time horizon
-Num_Trials = 50; 
+Num_Trials = 100; 
 
 %fixed_arm = length(AvgThruput)/2 + 1;
 
@@ -41,14 +41,15 @@ for trial = 1:Num_Trials
     disp(trial)
 
     %% OSUB
-    %[U_KL_X, U_KL_reg, ~, U_KL_Arm, timer1] = OSUB(AvgThruput, 2, T, "KLUCB");  
-    %[U_UCB_X, U_UCB_reg, ~, U_UCB_Arm, timer2] = OSUB(AvgThruput, 2, T, "UCB");
-    %[U_TS_X, U_TS_reg, ~, U_TS_Arm, timer3] = OSUB(AvgThruput, 2, T, "TS");
+    [U_KL_X, U_KL_reg, ~, U_KL_Arm, timer1] = OSUB(AvgThruput, 2, T, "KLUCB");  
+    [U_UCB_X, U_UCB_reg, ~, U_UCB_Arm, timer2] = OSUB(AvgThruput, 2, T, "UCB");
+    [U_TS_X, U_TS_reg, ~, U_TS_Arm, timer3] = OSUB(AvgThruput, 2, T, "TS");
     
     %% Classic algs
-    [~, U_KL_reg, U_KL_Arm, timer1] = KLUCB(AvgThruput, T);  
-    [~, U_UCB_reg, U_UCB_Arm, timer2] = UCB(AvgThruput, T);
-    [~, U_TS_reg, U_TS_Arm, timer3] = ThompsonSampling(AvgThruput, T);
+    
+    %[~, U_KL_reg, ~, U_KL_Arm, timer1] = KLUCB(AvgThruput, T, "KLUCB");  
+    %[~, U_UCB_reg, ~, U_UCB_Arm, timer2] = UCB(AvgThruput, T, "UCB");
+    %[~, U_TS_reg, ~, U_TS_Arm, timer3] = Classic(AvgThruput, T, "TS");
     
     
     %% Update records
