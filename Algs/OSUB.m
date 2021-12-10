@@ -15,7 +15,6 @@ function [reward, regret, asympregret, k, timer] = OSUB(Env, gamma, Time, alg)
     for t = 1:Time
         tic;
         
-        
         if t < K+1
             k(t) = t;  % Or arms within the neighborhood of initial L(t)
         else
@@ -36,11 +35,11 @@ function [reward, regret, asympregret, k, timer] = OSUB(Env, gamma, Time, alg)
             end
             
             % Threshold for determining to choose current leader or not
-            sl = (l(L(t))-1)/(gamma+1);
-            %sl = (l(L(t)))/(gamma+1);
-            %if sl>=1 && floor(sl)==sl
-            %    k(t) = L(t);
-            %else
+            %sl = (l(L(t))-1)/(gamma+1);
+            sl = (l(L(t)))/(gamma+1);
+            if sl>=1 && floor(sl)==sl
+                k(t) = L(t);
+            else
                 switch alg
                     case "KLUCB"
                         k(t) = N(1)-1+F_KLUCB(mu(N),T(N),l(L(t)));
@@ -51,7 +50,7 @@ function [reward, regret, asympregret, k, timer] = OSUB(Env, gamma, Time, alg)
                     case "AdaUCB"
                         k(t) = N(1)-1+F_AdaUCB(mu(N),T(N),Time);
                 end
-            %end
+            end
         end
         
     
