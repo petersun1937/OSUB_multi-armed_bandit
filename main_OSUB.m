@@ -6,7 +6,8 @@ addpath('Utilities')
 
 %% Inputs and parameters
 
-AvgThruput = [0.1:0.1:0.9 0.8:-0.1:0.1];    %K=17
+AvgThruput = [0.1:0.2:0.9 0.7:-0.2:0.1];    %K=9
+%AvgThruput = [0.1:0.1:0.9 0.8:-0.1:0.1];    %K=17
 %AvgThruput = [0.1:0.04:0.9 0.8:-0.04:0.1];    %K=39
 %AvgThruput = [0.1:0.02:0.9 0.8:-0.02:0.1];    %K=77
 %AvgThruput = [0.1:0.016:0.9 0.8:-0.016:0.1];    %K=95
