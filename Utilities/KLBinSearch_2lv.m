@@ -27,6 +27,6 @@ for j = 1:32          %2^(K)?
     ub2(down) = q(down);
     lb2(~down) = q(~down);
 end
-ucb = ub1*ub2;
+ucb = ub1.*ub2;
 
 end

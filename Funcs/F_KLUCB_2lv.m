@@ -5,7 +5,7 @@ function [k] = F_KLUCB_2lv(p1,p2,s,n)
     
     b_k = KLBinSearch_2lv(f,p1,p2);
     
-    b_k(p==1) = 1; 
+    b_k(p1.*p2==1) = 1; 
     b_k(s==0) = 1; 
     
     %ArmToPlay = PickingMaxIndexArm(ucb);

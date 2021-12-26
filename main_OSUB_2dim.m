@@ -4,7 +4,7 @@ addpath('Funcs')
 addpath('Utilities')
 
 %% Sim Setup
-setup = 'sim4';
+setup = 'sim3';
 
 switch setup
     case 'sim1'
@@ -71,14 +71,19 @@ for trial = 1:Num_Trials
     disp(trial)
 
     %% OSUB
-    [TS_X, TS_reg, TS_areg, TS_Arm, timer1] = OSUB_TwoDim(PredProb, TranProbr, TranProbb, 4, T, "TS");
-    [KL_X, KL_reg, KL_areg, KL_Arm, timer2] = OSUB_TwoDim(PredProb, TranProbr, TranProbb, 4, T, "KLUCB");  
-    [UCB_X, UCB_reg, UCB_areg, UCB_Arm, timer3] = OSUB_TwoDim(PredProb, TranProbr, TranProbb, 4, T, "UCB");
+    %[TS_X, TS_reg, TS_areg, TS_Arm, timer1] = OSUB_TwoDim(PredProb, TranProbr, TranProbb, 4, T, "TS");
+    %[KL_X, KL_reg, KL_areg, KL_Arm, timer2] = OSUB_TwoDim(PredProb, TranProbr, TranProbb, 4, T, "KLUCB");  
+    %[UCB_X, UCB_reg, UCB_areg, UCB_Arm, timer3] = OSUB_TwoDim(PredProb, TranProbr, TranProbb, 4, T, "UCB");
+
+    %% OSUB-two-level
+    %[TS_X, TS_reg, TS_areg, TS_Arm, timer1] = OSUB_TwoDim_2lv(PredProb, TranProbr, TranProbb, 4, T, "TS");
+    %[KL_X, KL_reg, KL_areg, KL_Arm, timer2] = OSUB_TwoDim_2lv(PredProb, TranProbr, TranProbb, 4, T, "KLUCB");  
+    %[UCB_X, UCB_reg, UCB_areg, UCB_Arm, timer3] = OSUB_TwoDim_2lv(PredProb, TranProbr, TranProbb, 4, T, "UCB");
     
     %% Classic
-    %[TS_X, TS_reg, TS_areg, TS_Arm, timer1] = Classic_2dim(PredProb, TranProbr, TranProbb, T, "TS");
-    %[KL_X, KL_reg, KL_areg, KL_Arm, timer2] = Classic_2dim(PredProb, TranProbr, TranProbb, T, "KLUCB");  
-    %[UCB_X, UCB_reg, UCB_areg, UCB_Arm, timer3] = Classic_2dim(PredProb, TranProbr, TranProbb, T, "UCB");
+    [TS_X, TS_reg, TS_areg, TS_Arm, timer1] = Classic_2dim(PredProb, TranProbr, TranProbb, T, "TS");
+    [KL_X, KL_reg, KL_areg, KL_Arm, timer2] = Classic_2dim(PredProb, TranProbr, TranProbb, T, "KLUCB");  
+    [UCB_X, UCB_reg, UCB_areg, UCB_Arm, timer3] = Classic_2dim(PredProb, TranProbr, TranProbb, T, "UCB");
    
     %% Update records
     KL_SelectedArms       = [KL_SelectedArms; KL_Arm];
@@ -97,10 +102,9 @@ for trial = 1:Num_Trials
     %U_UCB_mu_exp = (U_UCB_mu + U_UCB_mu_exp*(trial-1))/trial;
     %U_TS_mu_exp = (U_TS_mu + U_TS_mu_exp*(trial-1))/trial;
     
-    
-    KL_timer = [KL_timer; timer1];
-    UCB_timer = [UCB_timer; timer2];
-    TS_timer = [TS_timer; timer3];
+    TS_timer = [TS_timer; timer1];
+    KL_timer = [KL_timer; timer2];
+    UCB_timer = [UCB_timer; timer3];
     
       
 
@@ -117,8 +121,11 @@ end
 
 %save("TS_result.mat")
 
-%PlotRegret2(regret_TS,regret_DTS,std_TS,std_DTS,CI95_TS,CI95_DTS,...
-%    "Single-Feedback Thompson Sampling", "Two-level feedback TS")
+%PlotRegret(cumreg_KL,std_KL,CI95_KL,...
+%    "KL-UCB")
+
+%lotRegret2(cumreg_TS,cumreg_KL,std_TS,std_KL,CI95_TS,CI95_KL,...
+%     "Thompson Sampling", "KL-UCB")
 
 PlotRegret3(cumreg_UCB,cumreg_KL,cumreg_TS,std_UCB,std_KL,std_TS,...
     CI95_UCB,CI95_KL,CI95_TS,"UCB","KL-UCB","Thompson Sampling")

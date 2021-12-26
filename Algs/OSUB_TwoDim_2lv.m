@@ -7,6 +7,7 @@ function [reward, regret, asympregret, k, timer] = OSUB_TwoDim_2lv(Env1_1, Env1_
     mu1 = zeros(K1,K2);
     l = zeros(K1,K2);
     T = zeros(K1,K2);  S1 = zeros(K1,K2);    F1 = zeros(K1,K2);
+    S2 = zeros(K1,K2);  F2 = zeros(K1,K2);
     reward = [];    %SelectedArm = [];
     asympregret = zeros(1,Time);
     regret = zeros(1,Time);
@@ -69,7 +70,7 @@ function [reward, regret, asympregret, k, timer] = OSUB_TwoDim_2lv(Env1_1, Env1_
         
         
         %if t > 1
-        [~,L_temp] = max(mu1*mu2, [], 'all', 'linear');
+        [~,L_temp] = max(mu1.*mu2, [], 'all', 'linear');
         [L(t,1),L(t,2)] = ind2sub([K1,K2],L_temp);
         % end
 
@@ -98,16 +99,17 @@ function [reward, regret, asympregret, k, timer] = OSUB_TwoDim_2lv(Env1_1, Env1_
         %if sl>=1 && floor(sl)==sl
         %    k(t,:) = L(t,:);
         %else
-            S_N = S1(N1,N2);  F_N = F1(N1,N2);
-            T_N = T(N1,N2);  mu_N = mu1(N1,N2);
+            S1_N = S1(N1,N2);  F1_N = F1(N1,N2);
+            S2_N = S2(N1,N2);  F2_N = F2(N1,N2);
+            T_N = T(N1,N2);  mu1_N = mu1(N1,N2); mu2_N = mu2(N1,N2);
             
             switch alg
                 case "KLUCB"
-                    k_temp = F_KLUCB(mu_N(:),T_N(:),l(L(t,1),L(t,2)));
+                    k_temp = F_KLUCB_2lv(mu1_N(:),mu2_N(:),T_N(:),l(L(t,1),L(t,2)));
                 case "UCB"
-                    k_temp = F_UCB(mu_N(:),T_N(:),1/(Time)^2);
+                    k_temp = F_UCB_2lv(mu1_N(:),mu2_N(:),T_N(:),1/(Time)^2);
                 case "TS"
-                    k_temp = F_TS(S_N(:),F_N(:));
+                    k_temp = F_TS_2lv(S1_N(:),S2_N(:),F1_N(:),F2_N(:));
                 case "AdaUCB"
                     k_temp = F_AdaUCB(mu_N(:),T_N(:),Time);
             end
@@ -131,9 +133,12 @@ function [reward, regret, asympregret, k, timer] = OSUB_TwoDim_2lv(Env1_1, Env1_
 
 
         S1(k(t,1),k(t,2)) = S1(k(t,1),k(t,2)) + Z;
-        F1(k(t,1),k(t,2)) = F1(k(t,1),k(t,2)) + ~Z;
+        S2(k(t,1),k(t,2)) = S2(k(t,1),k(t,2)) + Y;
+        F1(k(t,1),k(t,2)) = F1(k(t,1),k(t,2)) + ~X;
+        F2(k(t,1),k(t,2)) = F2(k(t,1),k(t,2)) + ~Y;
 
         mu1(k(t,1),k(t,2)) = S1(k(t,1),k(t,2))./T(k(t,1),k(t,2));
+        mu2(k(t,1),k(t,2)) = (S2(k(t,1),k(t,2)))./T(k(t,1),k(t,2));
         
         tend = toc;
         timer = [timer tend];
