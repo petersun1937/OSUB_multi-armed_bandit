@@ -4,7 +4,7 @@ addpath('Funcs')
 addpath('Utilities')
 
 %% Sim Setup
-setup = 'sim3';
+setup = 'sim4';
 
 switch setup
     case 'sim1'
@@ -76,14 +76,14 @@ for trial = 1:Num_Trials
     %[UCB_X, UCB_reg, UCB_areg, UCB_Arm, timer3] = OSUB_TwoDim(PredProb, TranProbr, TranProbb, 4, T, "UCB");
 
     %% OSUB-two-level
-    %[TS_X, TS_reg, TS_areg, TS_Arm, timer1] = OSUB_TwoDim_2lv(PredProb, TranProbr, TranProbb, 4, T, "TS");
-    %[KL_X, KL_reg, KL_areg, KL_Arm, timer2] = OSUB_TwoDim_2lv(PredProb, TranProbr, TranProbb, 4, T, "KLUCB");  
-    %[UCB_X, UCB_reg, UCB_areg, UCB_Arm, timer3] = OSUB_TwoDim_2lv(PredProb, TranProbr, TranProbb, 4, T, "UCB");
+    [TS_X, TS_reg, TS_areg, TS_Arm, timer1] = OSUB_TwoDim_2lv(PredProb, TranProbr, TranProbb, 4, T, "TS");
+    [KL_X, KL_reg, KL_areg, KL_Arm, timer2] = OSUB_TwoDim_2lv(PredProb, TranProbr, TranProbb, 4, T, "KLUCB");  
+    [UCB_X, UCB_reg, UCB_areg, UCB_Arm, timer3] = OSUB_TwoDim_2lv(PredProb, TranProbr, TranProbb, 4, T, "UCB");
     
     %% Classic
-    [TS_X, TS_reg, TS_areg, TS_Arm, timer1] = Classic_2dim(PredProb, TranProbr, TranProbb, T, "TS");
-    [KL_X, KL_reg, KL_areg, KL_Arm, timer2] = Classic_2dim(PredProb, TranProbr, TranProbb, T, "KLUCB");  
-    [UCB_X, UCB_reg, UCB_areg, UCB_Arm, timer3] = Classic_2dim(PredProb, TranProbr, TranProbb, T, "UCB");
+    %[TS_X, TS_reg, TS_areg, TS_Arm, timer1] = Classic_2dim(PredProb, TranProbr, TranProbb, T, "TS");
+    %[KL_X, KL_reg, KL_areg, KL_Arm, timer2] = Classic_2dim(PredProb, TranProbr, TranProbb, T, "KLUCB");  
+    %[UCB_X, UCB_reg, UCB_areg, UCB_Arm, timer3] = Classic_2dim(PredProb, TranProbr, TranProbb, T, "UCB");
    
     %% Update records
     KL_SelectedArms       = [KL_SelectedArms; KL_Arm];
