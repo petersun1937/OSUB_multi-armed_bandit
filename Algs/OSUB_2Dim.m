@@ -1,4 +1,4 @@
-function [reward, regret, asympregret, k, timer] = OSUB_2Dim(Env1_1, Env1_2, Env2, gamma, Time, alg)
+function [reward, regret, asympregret, k, timer] = OSUB_2dim(Env1_1, Env1_2, Env2, gamma, Time, alg)
     
     Env = (Env1_1.*Env1_2)'.*Env2;
 
