@@ -4,7 +4,7 @@ function [reward, regret, asympregret, k, timer] = OSUB_TwoDim_2lv(Env1_1, Env1_
 
     K1 = length(Env1_1);    K2 = length(Env2);
     L = zeros(Time,2);  %L(1) = randi(K);
-    mu1 = zeros(K1,K2);
+    mu1 = zeros(K1,K2);  mu2 = zeros(K1,K2);
     l = zeros(K1,K2);
     T = zeros(K1,K2);  S1 = zeros(K1,K2);    F1 = zeros(K1,K2);
     S2 = zeros(K1,K2);  F2 = zeros(K1,K2);

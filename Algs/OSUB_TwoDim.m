@@ -70,33 +70,39 @@ function [reward, regret, asympregret, k, timer] = OSUB_TwoDim(Env1_1, Env1_2, E
         % end
 
         l(L(t,1),L(t,2)) = l(L(t,1),L(t,2)) + 1;
-
-        if L(t,1)>1 && L(t,1)<K1
-            N1 = [(L(t,1)-1):(L(t,1)+1)];
-        elseif L(t,1)==K1
-            N1 = [L(t,1)-1 L(t,1)];
-        else
-            N1 = [L(t,1) L(t,1)+1];
-        end
-        
-        if L(t,2)>1 && L(t,2)<K2
-            N2 = [(L(t,2)-1):(L(t,2)+1)];
-        elseif L(t,2)==K2
-            N2 = [L(t,2)-1 L(t,2)];
-        else
-            N2 = [L(t,2) L(t,2)+1];
-        end
-
         % Threshold for determining to choose current leader or not
         sl = (l(L(t,1),L(t,2))-1)/(gamma+1);
         %sl = (l(L(t)))/(gamma+1);
         
-        %if sl>=1 && floor(sl)==sl
-        %    k(t,:) = L(t,:);
-        %else
+        if sl>=1 && floor(sl)==sl
+            k(t,:) = L(t,:);
+        else
+            if L(t,1)>1 && L(t,1)<K1
+                N1 = [(L(t,1)-1):(L(t,1)+1)];
+                corner1 = [1 3];
+            elseif L(t,1)==K1
+                N1 = [L(t,1)-1:L(t,1)];
+                corner1 = [1];
+            else
+                N1 = [L(t,1):L(t,1)+1];
+                corner1 = [2];
+            end
+
+            if L(t,2)>1 && L(t,2)<K2
+                N2 = [(L(t,2)-1):(L(t,2)+1)];
+                corner2 = [1 3];
+            elseif L(t,2)==K2
+                N2 = [L(t,2)-1 L(t,2)];
+                corner2 = [1];
+            else
+                N2 = [L(t,2) L(t,2)+1];
+                corner2 = [2];
+            end
+        
             S_N = S(N1,N2);  F_N = F(N1,N2);
             T_N = T(N1,N2);  mu_N = mu(N1,N2);
             
+            %{
             switch alg
                 case "KLUCB"
                     k_temp = F_KLUCB(mu_N(:),T_N(:),l(L(t,1),L(t,2)));
@@ -111,10 +117,36 @@ function [reward, regret, asympregret, k, timer] = OSUB_TwoDim(Env1_1, Env1_2, E
             [k1,k2] = ind2sub([length(N1),length(N2)],k_temp);
             k(t,1) = N1(1)-1+k1;
             k(t,2) = N2(1)-1+k2;
+            %}
+        
+            %%  
             
+        [m,n] = ndgrid(corner1, corner2);
+        corner = sub2ind([length(N1) length(N2)],m(:),n(:));
+        S_N(corner)=0; 
+        F_N(corner)=inf; 
+        T_N(corner)=inf; 
+        mu_N(corner)=0; 
+
+        switch alg
+            case "KLUCB"
+                k_temp = F_KLUCB(mu_N(:),T_N(:),l(L(t,1),L(t,2)));
+            case "UCB"
+                k_temp = F_UCB(mu_N(:),T_N(:),1/(Time)^2);
+            case "TS"
+                k_temp = F_TS(S_N(:),F_N(:));
+            case "AdaUCB"
+                k_temp = F_AdaUCB(mu_N(:),T_N(:),Time);
+        end
+        
+        
+        [k1,k2] = ind2sub([length(N1),length(N2)],k_temp);
+        k(t,1) = N1(1)-1+k1;
+        k(t,2) = N2(1)-1+k2;
+           %}
             %k(t) = F_DTS(S1,S2,F1,F2);
             %k(t) = N(1)-1+F_DTS(S1(N),S2(N),F1(N),F2(N));
-        %end
+        end
         
         X = rand() < Env1_1(k(t,1));
         Y = rand() < Env1_2(k(t,1))*Env2(k(t,2));
