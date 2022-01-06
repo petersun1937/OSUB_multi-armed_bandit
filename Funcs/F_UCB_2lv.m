@@ -1,6 +1,6 @@
 function [k] = F_UCB_2lv(mu1,mu2,T,delta)
     
-    f = mu1+mu2+sqrt((2./T).*log(1/delta));
+    f = mu1.*mu2+sqrt((2./T).*log(1/delta));
     m = max(f);
     % Randomly pick one of the max-valued arm
     if ( ~isnan(m))

@@ -110,8 +110,8 @@ function [reward, regret, asympregret, k, timer] = OSUB_2dim(Env1_1, Env1_2, Env
                     k_temp = F_UCB(mu_N(:),T_N(:),1/(Time)^2);
                 case "TS"
                     k_temp = F_TS(S_N(:),F_N(:));
-                case "AdaUCB"
-                    k_temp = F_AdaUCB(mu_N(:),T_N(:),Time);
+                %case "AdaUCB"
+                    %k_temp = F_AdaUCB(mu_N(:),T_N(:),Time);
             end
             
             [k1,k2] = ind2sub([length(N1),length(N2)],k_temp);
@@ -120,7 +120,7 @@ function [reward, regret, asympregret, k, timer] = OSUB_2dim(Env1_1, Env1_2, Env
             %}
         
             %%  
-            
+        
         [m,n] = ndgrid(corner1, corner2);
         corner = sub2ind([length(N1) length(N2)],m(:),n(:));
         S_N(corner)=0; 
@@ -135,8 +135,8 @@ function [reward, regret, asympregret, k, timer] = OSUB_2dim(Env1_1, Env1_2, Env
                 k_temp = F_UCB(mu_N(:),T_N(:),1/(Time)^2);
             case "TS"
                 k_temp = F_TS(S_N(:),F_N(:));
-            case "AdaUCB"
-                k_temp = F_AdaUCB(mu_N(:),T_N(:),Time);
+            %case "AdaUCB"
+                %k_temp = F_AdaUCB(mu_N(:),T_N(:),Time);
         end
         
         

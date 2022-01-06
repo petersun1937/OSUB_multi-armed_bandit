@@ -1,4 +1,4 @@
-function [reward, regret, asympregret, k, timer] = OSUB_2dim_2lv(Env1_1, Env1_2, Env2, gamma, Time, alg)
+function [reward, regret, asympregret, k, timer] = OSUB_iter(Env1_1, Env1_2, Env2, gamma, Time, alg)
     
     Env = (Env1_1.*Env1_2)'.*Env2;
 
@@ -6,7 +6,9 @@ function [reward, regret, asympregret, k, timer] = OSUB_2dim_2lv(Env1_1, Env1_2,
     L = zeros(Time,2);  %L(1) = randi(K);
     mu1 = zeros(K1,K2);
     l = zeros(K1,K2);
-    T = zeros(K1,K2);  S1 = zeros(K1,K2);    F1 = zeros(K1,K2);
+    T = zeros(K1,K2);  
+    S = zeros(K1,K2);    F = zeros(K1,K2);
+    S1 = zeros(K1,K2);    F1 = zeros(K1,K2);
     S2 = zeros(K1,K2);  F2 = zeros(K1,K2);
     reward = [];    %SelectedArm = [];
     asympregret = zeros(1,Time);
@@ -20,10 +22,9 @@ function [reward, regret, asympregret, k, timer] = OSUB_2dim_2lv(Env1_1, Env1_2,
     
     tic;
     t=0;
-    for i= 1:K1
-        for j=1:K2
+    for j=1:K2
             
-        k = [k; i j];
+        k = [k; 1 j];
         t=t+1;
 
         X = rand() < Env1_1(k(t,1));
@@ -34,15 +35,12 @@ function [reward, regret, asympregret, k, timer] = OSUB_2dim_2lv(Env1_1, Env1_2,
 
         T(k(t,1),k(t,2)) = T(k(t,1),k(t,2)) + 1;
 
-        S1(k(t,1),k(t,2)) = S1(k(t,1),k(t,2)) + X;
-        S2(k(t,1),k(t,2)) = S2(k(t,1),k(t,2)) + Y;
-        F1(k(t,1),k(t,2)) = F1(k(t,1),k(t,2)) + ~X;
-        F2(k(t,1),k(t,2)) = F2(k(t,1),k(t,2)) + ~Y;
+        S(k(t,1),k(t,2)) = S(k(t,1),k(t,2)) + X;
+        F(k(t,1),k(t,2)) = F(k(t,1),k(t,2)) + ~X;
        % mu_h = S./T;
        % ExpectedMeans(Is) = (ExpectedMeans(Is)*T(Is) + reward)./(T(Is)+1);
        % Empirical reward
-        mu1(k(t,1),k(t,2)) = (S1(k(t,1),k(t,2)))./T(k(t,1),k(t,2));
-        mu2(k(t,1),k(t,2)) = (S2(k(t,1),k(t,2)))./T(k(t,1),k(t,2));
+        mu(k(t,1),k(t,2)) = (S(k(t,1),k(t,2)))./T(k(t,1),k(t,2));
         
         
         
@@ -63,10 +61,9 @@ function [reward, regret, asympregret, k, timer] = OSUB_2dim_2lv(Env1_1, Env1_2,
             %regret(t) = t*max(Env1_1.*Env1_2)*max(Env2) - sum(reward);
         end
         %}
-        end
     end
     
-    for t = K1*K2+1:Time
+    for t = K2+1:Time
         
         
         %if t > 1
