@@ -4,7 +4,7 @@ function [reward, regret, asympregret, k, timer] = OSUB_iter(Env1_1, Env1_2, Env
 
     K1 = length(Env1_1);    K2 = length(Env2);
     L = zeros(Time,2);  %L(1) = randi(K);
-    mu1 = zeros(K1,K2);
+    mu = zeros(K1,K2); mu1 = zeros(K1,K2);
     l = zeros(K1,K2);
     T = zeros(K1,K2);  
     S = zeros(K1,K2);    F = zeros(K1,K2);
@@ -22,57 +22,59 @@ function [reward, regret, asympregret, k, timer] = OSUB_iter(Env1_1, Env1_2, Env
     
     tic;
     t=0;
-    for j=1:K2
+    init_k = ceil(K1/2);
+    for i=1:K2
             
-        k = [k; 1 j];
-        t=t+1;
+            k = [k; init_k i];
+            t=t+1;
 
-        X = rand() < Env1_1(k(t,1));
-        Y = rand() < Env1_2(k(t,1))*Env2(k(t,2));
-        Z = X*Y;
-        
-        reward = [reward Z];
+            X = rand() < Env1_1(k(t,1));
+            Y = rand() < Env1_2(k(t,1))*Env2(k(t,2));
+            Z = X*Y;
 
-        T(k(t,1),k(t,2)) = T(k(t,1),k(t,2)) + 1;
+            reward = [reward Z];
 
-        S(k(t,1),k(t,2)) = S(k(t,1),k(t,2)) + X;
-        F(k(t,1),k(t,2)) = F(k(t,1),k(t,2)) + ~X;
-       % mu_h = S./T;
-       % ExpectedMeans(Is) = (ExpectedMeans(Is)*T(Is) + reward)./(T(Is)+1);
-       % Empirical reward
-        mu(k(t,1),k(t,2)) = (S(k(t,1),k(t,2)))./T(k(t,1),k(t,2));
-        
-        
-        
-        %% Compute regret
-        delta_k = max(Env1_1.*Env1_2)*max(Env2) - (Env1_1.*Env1_2)'.*Env2;
-        regret(t) = sum((delta_k).*T, 'all');
-        %regret(t) = (t*max(Env1_1.*Env1_2)*max(Env2)) - sum(reward);
-        %{
-        if t>1
-            regret(t) = regret(t-1) + (max(Env1_1)*max(Env1_2)*max(Env2) - Env1_1(k(t,1))*Env1_2(k(t,1))*Env2(k(t,2)));
-            %regret(t) = regret(t-1) + sum((max(Env1_1.*Env1_2)*max(Env2) - Env).*T, 'all')/t;
-            %regret(t) = regret(t-1) + (max(Env1_1.*Env1_2)*max(Env2) - mean(reward,2));
+            T(k(t,1),k(t,2)) = T(k(t,1),k(t,2)) + 1;
+
+            S(k(t,1),k(t,2)) = S(k(t,1),k(t,2)) + Z;
+            F(k(t,1),k(t,2)) = F(k(t,1),k(t,2)) + ~Z;
+           % mu_h = S./T;
+           % ExpectedMeans(Is) = (ExpectedMeans(Is)*T(Is) + reward)./(T(Is)+1);
+           % Empirical reward
+            mu(k(t,1),k(t,2)) = (S(k(t,1),k(t,2)))./T(k(t,1),k(t,2));
+
+
+
+            %% Compute regret
+            delta_k = max(Env1_1.*Env1_2)*max(Env2) - (Env1_1.*Env1_2)'.*Env2;
+            regret(t) = sum((delta_k).*T, 'all');
             %regret(t) = (t*max(Env1_1.*Env1_2)*max(Env2)) - sum(reward);
-        else
-            regret(1) = (max(Env1_1)*max(Env1_2)*max(Env2) - Env1_1(k(t,1))*Env1_2(k(t,1))*Env2(k(t,2)));
-            %regret(1) = sum((max(Env1_1.*Env1_2)*max(Env2) - Env).*T, 'all')/t;
-            %regret(1) = max(Env1_1.*Env1_2)*max(Env2) - mean(reward,2);
-            %regret(t) = t*max(Env1_1.*Env1_2)*max(Env2) - sum(reward);
-        end
-        %}
+            %{
+            if t>1
+                regret(t) = regret(t-1) + (max(Env1_1)*max(Env1_2)*max(Env2) - Env1_1(k(t,1))*Env1_2(k(t,1))*Env2(k(t,2)));
+                %regret(t) = regret(t-1) + sum((max(Env1_1.*Env1_2)*max(Env2) - Env).*T, 'all')/t;
+                %regret(t) = regret(t-1) + (max(Env1_1.*Env1_2)*max(Env2) - mean(reward,2));
+                %regret(t) = (t*max(Env1_1.*Env1_2)*max(Env2)) - sum(reward);
+            else
+                regret(1) = (max(Env1_1)*max(Env1_2)*max(Env2) - Env1_1(k(t,1))*Env1_2(k(t,1))*Env2(k(t,2)));
+                %regret(1) = sum((max(Env1_1.*Env1_2)*max(Env2) - Env).*T, 'all')/t;
+                %regret(1) = max(Env1_1.*Env1_2)*max(Env2) - mean(reward,2);
+                %regret(t) = t*max(Env1_1.*Env1_2)*max(Env2) - sum(reward);
+            end
+            %}
     end
     
-    for t = K2+1:Time
+   % [~,opt_b] = max(mu(init_k,:));
+    
+    for t = K2*round(log(Time))+1:Time
         
         
         %if t > 1
-        [~,L_temp] = max(mu1.*mu2, [], 'all', 'linear');
+        [~,L_temp] = max(mu, [], 'all', 'linear');
         [L(t,1),L(t,2)] = ind2sub([K1,K2],L_temp);
         % end
-
         l(L(t,1),L(t,2)) = l(L(t,1),L(t,2)) + 1;
-
+        
         if L(t,1)>1 && L(t,1)<K1
             N1 = [(L(t,1)-1):(L(t,1)+1)];
             corner1 = [1 3];
@@ -94,6 +96,8 @@ function [reward, regret, asympregret, k, timer] = OSUB_iter(Env1_1, Env1_2, Env
             N2 = [L(t,2) L(t,2)+1];
             corner2 = [2];
         end
+        
+        
 
         % Threshold for determining to choose current leader or not
         sl = (l(L(t,1),L(t,2))-1)/(gamma+1);
@@ -102,51 +106,19 @@ function [reward, regret, asympregret, k, timer] = OSUB_iter(Env1_1, Env1_2, Env
         if sl>=1 && floor(sl)==sl
             k(t,:) = L(t,:);
         else
-            S1_N = S1(N1,N2);  F1_N = F1(N1,N2);
-            S2_N = S2(N1,N2);  F2_N = F2(N1,N2);
-            T_N = T(N1,N2);  mu1_N = mu1(N1,N2); mu2_N = mu2(N1,N2);
-            %{
-            switch alg
-                case "KLUCB"
-                    k_temp = F_KLUCB_2lv(mu1_N(:),mu2_N(:),T_N(:),l(L(t,1),L(t,2)));
-                case "UCB"
-                    k_temp = F_UCB_2lv(mu1_N(:),mu2_N(:),T_N(:),1/(Time)^2);
-                case "TS"
-                    k_temp = F_TS_2lv(S1_N(:),S2_N(:),F1_N(:),F2_N(:));
-                %case "AdaUCB"
-                    %k_temp = F_AdaUCB(mu_N(:),T_N(:),Time);
-            end
-            
-            [k1,k2] = ind2sub([length(N1),length(N2)],k_temp);
-            k(t,1) = N1(1)-1+k1;
-            k(t,2) = N2(1)-1+k2;
-            %}
-            %k(t) = F_DTS(S1,S2,F1,F2);
-            %k(t) = N(1)-1+F_DTS(S1(N),S2(N),F1(N),F2(N));
-            
-        %%
-        [m,n] = ndgrid(corner1, corner2);
-        corner = sub2ind([length(N1) length(N2)],m(:),n(:));
-        S1_N(corner)=0; S2_N(corner)=0; 
-        F1_N(corner)=inf;  F2_N(corner)=inf;
-        T_N(corner)=inf; 
-        mu1_N(corner)=0;  mu2_N(corner)=0;
 
+            
+            
         switch alg
-            case "KLUCB"
-                k_temp = F_KLUCB_2lv(mu1_N(:),mu2_N(:),T_N(:),l(L(t,1),L(t,2)));
-            case "UCB"
-                k_temp = F_UCB_2lv(mu1_N(:),mu2_N(:),T_N(:),1/(Time)^2);
-            case "TS"
-                k_temp = F_TS_2lv(S1_N(:),S2_N(:),F1_N(:),F2_N(:));
-            %case "AdaUCB"
-                %k_temp = F_AdaUCB(mu_N(:),T_N(:),Time);
+        case "KLUCB"
+            k(t) = N(1)-1+F_KLUCB(mu(N),T(N),l(L(t)));
+        case "UCB"
+            k(t) = N(1)-1+F_UCB(mu(N),T(N),1/(Time)^2);
+        case "TS"
+            k(t) = N(1)-1+F_TS(S(N),F(N));
+        case "AdaUCB"
+            k(t) = N(1)-1+F_AdaUCB(mu(N),T(N),Time);
         end
-        
-        
-        [k1,k2] = ind2sub([length(N1),length(N2)],k_temp);
-        k(t,1) = N1(1)-1+k1;
-        k(t,2) = N2(1)-1+k2;
             
             
             

@@ -4,7 +4,7 @@ addpath('Funcs')
 addpath('Utilities')
 
 %% Sim Setup
-setup = 'sim5';
+setup = 'sim6';
 
 switch setup
     case 'sim1'
@@ -20,7 +20,7 @@ switch setup
         TranProb = [0.99 0.9 0.85 0.15 0.05];
         % Avgthruput = [0.0198 0.216 5.44 1.32 0.5225]
     case 'sim3'
-       % 3nd setup (w/ beam selection)
+       % 3rd setup (w/ beam selection)
         Rate = [2 3 5 6 9]; 
         
         PredProb = [0.01 0.08 0.8 0.88 0.95];
@@ -31,7 +31,7 @@ switch setup
         
         AvgThruput = (PredProb.*TranProbr)'.*TranProbb;
     case 'sim4'
-       % 4nd setup (vertically not unimodal)
+       % 4th setup (vertically not unimodal)
         Rate = [2 3 5 6 8]; 
         
         PredProb = [0.15 0.3 0.45 0.6 0.75];
@@ -43,7 +43,7 @@ switch setup
         AvgThruput = (PredProb.*TranProbr)'.*TranProbb;
         
     case 'sim5'
-       % 4nd setup (vertically not unimodal)
+       % 5th setup (vertically not unimodal)
         Rate = [2 3 5 6 8]; 
         
         PredProb = [0.15 0.3 0.45 0.6 0.75];
@@ -51,6 +51,18 @@ switch setup
         
         Beam = [1 2 3 4 5 6 7 8 9];
         TranProbb = [0.1:0.2:0.9 0.7:-0.2:0.1];
+        
+        AvgThruput = (PredProb.*TranProbr)'.*TranProbb;
+        
+    case 'sim6'
+       % 6th setup (trans prob peaks at opt beam)
+        Rate = [2 3 5 6 8]; 
+        
+        PredProb = [0.01 0.08 0.8 0.88 0.95];
+        TranProbr = [0.99 0.9 0.85 0.15 0.05];
+        
+        Beam = [1 2 3 4 5 6 7 8 9];
+        TranProbb = [0.01 0.05 0.15 0.5 0.9 0.5 0.15 0.05 0.01];
         
         AvgThruput = (PredProb.*TranProbr)'.*TranProbb;
 end
