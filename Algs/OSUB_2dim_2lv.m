@@ -165,7 +165,7 @@ function [reward, regret, asympregret, k, timer] = OSUB_2dim_2lv(Env1_1, Env1_2,
         T(k(t,1),k(t,2)) = T(k(t,1),k(t,2)) + 1;
 
 
-        S1(k(t,1),k(t,2)) = S1(k(t,1),k(t,2)) + Z;
+        S1(k(t,1),k(t,2)) = S1(k(t,1),k(t,2)) + X;
         S2(k(t,1),k(t,2)) = S2(k(t,1),k(t,2)) + Y;
         F1(k(t,1),k(t,2)) = F1(k(t,1),k(t,2)) + ~X;
         F2(k(t,1),k(t,2)) = F2(k(t,1),k(t,2)) + ~Y;
