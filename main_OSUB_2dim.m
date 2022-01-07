@@ -62,7 +62,7 @@ switch setup
         TranProbr = [0.99 0.9 0.85 0.15 0.05];
         
         Beam = [1 2 3 4 5 6 7 8 9];
-        TranProbb = [0.01 0.05 0.15 0.5 0.9 0.5 0.15 0.05 0.01];
+        TranProbb = [0.01 0.05 0.15 0.3 0.9 0.3 0.15 0.05 0.01];
         
         AvgThruput = (PredProb.*TranProbr)'.*TranProbb;
 end

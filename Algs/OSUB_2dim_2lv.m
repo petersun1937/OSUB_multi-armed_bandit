@@ -108,7 +108,7 @@ function [reward, regret, asympregret, k, timer] = OSUB_2dim_2lv(Env1_1, Env1_2,
             S1_N = S1(N1,N2);  F1_N = F1(N1,N2);
             S2_N = S2(N1,N2);  F2_N = F2(N1,N2);
             T_N = T(N1,N2);  mu1_N = mu1(N1,N2); mu2_N = mu2(N1,N2);
-            %{
+            
             switch alg
                 case "KLUCB"
                     k_temp = F_KLUCB_2lv(mu1_N(:),mu2_N(:),T_N(:),l(L(t,1),L(t,2)));
@@ -128,6 +128,7 @@ function [reward, regret, asympregret, k, timer] = OSUB_2dim_2lv(Env1_1, Env1_2,
             %k(t) = N(1)-1+F_DTS(S1(N),S2(N),F1(N),F2(N));
             
         %%
+        %{
         [m,n] = ndgrid(corner1, corner2);
         corner = sub2ind([length(N1) length(N2)],m(:),n(:));
         S1_N(corner)=0; S2_N(corner)=0; 
@@ -151,7 +152,7 @@ function [reward, regret, asympregret, k, timer] = OSUB_2dim_2lv(Env1_1, Env1_2,
         k(t,1) = N1(1)-1+k1;
         k(t,2) = N2(1)-1+k2;
             
-            
+        %}
             
         end
         
