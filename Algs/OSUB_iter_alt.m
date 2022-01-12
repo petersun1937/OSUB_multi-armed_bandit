@@ -117,6 +117,20 @@ function [reward, regret, asympregret, i, timer] = OSUB_iter(Env1_1, Env1_2, Env
     for t = K1+K2+1:Time
     
         
+        
+        
+        %% 2-lvl feedback algorithm on rate selection
+        switch alg
+            case "KLUCB"
+                k(t) = F_KLUCB_2lv(mu1(:,i(t-1)),mu2(:,i(t-1)),T(:,i(t-1)),t);
+            case "UCB"
+                k(t) = F_UCB_2lv(mu1(:,i(t-1)),mu2(:,i(t-1)),T(:,i(t-1)),1/(Time)^2);
+            case "TS"
+                k(t) = F_TS_2lv(S1(:,i(t-1)),S2(:,i(t-1)),F1(:,i(t-1)),F2(:,i(t-1)));
+        end
+
+        
+        %% OSUB on beam selection
         %if t > 1
         [~,Li_temp] = max(mu, [], 'all', 'linear');
         [~,Li(t)] = ind2sub([K1,K2],Li_temp);
@@ -130,45 +144,30 @@ function [reward, regret, asympregret, i, timer] = OSUB_iter(Env1_1, Env1_2, Env
         else
             N = [Li(t):Li(t)+1];
         end
- 
+        
         % Threshold for determining to choose current leader or not
         sl = (l(Li(t))-1)/(gamma+1);
         %sl = (l(L(t)))/(gamma+1);
-        
-        %% OSUB on beam selection
         if sl>=1 && floor(sl)==sl
             i(t) = Li(t);
         else
             
             switch alg
             case "KLUCB"
-                i(t) = N(1)-1+F_KLUCB(mu(k(t-1),N),T(k(t-1),N),l(Li(t)));
+                i(t) = N(1)-1+F_KLUCB(mu(k(t),N),T(k(t),N),l(Li(t)));
             case "UCB"
-                i(t) = N(1)-1+F_UCB(mu(k(t-1),N),T(k(t-1),N),1/(Time)^2);
+                i(t) = N(1)-1+F_UCB(mu(k(t),N),T(k(t),N),1/(Time)^2);
             case "TS"
-                i(t) = N(1)-1+F_TS(S(k(t-1),N),F(k(t-1),N));
+                i(t) = N(1)-1+F_TS(S(k(t),N),F(k(t),N));
             end
 
         end
-        
-        %% 2-lvl feedback algorithm on rate selection
-        switch alg
-            case "KLUCB"
-                k(t) = F_KLUCB_2lv(mu1(:,i(t)),mu2(:,i(t)),T(:,i(t)),t);
-            case "UCB"
-                k(t) = F_UCB_2lv(mu1(:,i(t)),mu2(:,i(t)),T(:,i(t)),1/(Time)^2);
-            case "TS"
-                k(t) = F_TS_2lv(S1(:,i(t)),S2(:,i(t)),F1(:,i(t)),F2(:,i(t)));
-        end
-
         
         X = rand() < Env1_1(k(t));
         Y = rand() < Env1_2(k(t))*Env2(i(t));
         Z = X*Y;
 
         reward = [reward Z];
-
-
         T(k(t),i(t)) = T(k(t),i(t)) + 1;
 
         % Single feedback
@@ -187,11 +186,8 @@ function [reward, regret, asympregret, i, timer] = OSUB_iter(Env1_1, Env1_2, Env
         mu1(k(t),i(t)) = S1(k(t),i(t))./T(k(t),i(t));
         mu2(k(t),i(t)) = S2(k(t),i(t))./T(k(t),i(t));
         
-        
-        
         tend = toc;
         timer = [timer tend];
-        
         
         
         
