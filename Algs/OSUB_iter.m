@@ -6,7 +6,7 @@ function [reward, regret, asympregret, i, timer] = OSUB_iter(Env1_1, Env1_2, Env
     Li = zeros(Time,1);  %L(1) = randi(K);
     mu = zeros(K1,K2); mu1 = zeros(K1,K2);
     mu2 = zeros(K1,K2);
-    l = zeros(K2);
+    l = zeros(1,K2);
     T = zeros(K1,K2);  
     S = zeros(K1,K2);    F = zeros(K1,K2);
     S1 = zeros(K1,K2);    F1 = zeros(K1,K2);
@@ -26,6 +26,7 @@ function [reward, regret, asympregret, i, timer] = OSUB_iter(Env1_1, Env1_2, Env
     t=0;
     init_k = ceil(K1/2);
     
+    for tt=1:round(log(Time))
     for j=1:K2
             
             t=t+1;
@@ -51,7 +52,15 @@ function [reward, regret, asympregret, i, timer] = OSUB_iter(Env1_1, Env1_2, Env
             mu(k(t),i(t)) = (S(k(t),i(t)))./T(k(t),i(t));
 
 
+            % For two-level feedback
+            S1(k(t),i(t)) = S1(k(t),i(t)) + X;
+            S2(k(t),i(t)) = S2(k(t),i(t)) + Y;
+            F1(k(t),i(t)) = F1(k(t),i(t)) + ~X;
+            F2(k(t),i(t)) = F2(k(t),i(t)) + ~Y;
 
+            mu1(k(t),i(t)) = S1(k(t),i(t))./T(k(t),i(t));
+            mu2(k(t),i(t)) = S2(k(t),i(t))./T(k(t),i(t));
+            
             %% Compute regret
             delta_k = max(Env1_1.*Env1_2)*max(Env2) - (Env1_1.*Env1_2)'.*Env2;
             regret(t) = sum((delta_k).*T, 'all');
@@ -70,8 +79,12 @@ function [reward, regret, asympregret, i, timer] = OSUB_iter(Env1_1, Env1_2, Env
             end
             %}
     end
-    [~,init_i] = max(mu(init_k,:));
+    end
+    mI = find(mu(init_k,:) == max(mu(init_k,:)));
+    init_i = mI(randi(length(mI)));         % Randomly pick one of the max
+    %[~,init_i] = max(mu(init_k,:));
     
+    %for tt=1:round(log(Time))
     for j=1:K1
             
             t=t+1;
@@ -97,7 +110,15 @@ function [reward, regret, asympregret, i, timer] = OSUB_iter(Env1_1, Env1_2, Env
             mu(k(t),i(t)) = (S(k(t),i(t)))./T(k(t),i(t));
 
 
+            % For two-level feedback
+            S1(k(t),i(t)) = S1(k(t),i(t)) + X;
+            S2(k(t),i(t)) = S2(k(t),i(t)) + Y;
+            F1(k(t),i(t)) = F1(k(t),i(t)) + ~X;
+            F2(k(t),i(t)) = F2(k(t),i(t)) + ~Y;
 
+            mu1(k(t),i(t)) = S1(k(t),i(t))./T(k(t),i(t));
+            mu2(k(t),i(t)) = S2(k(t),i(t))./T(k(t),i(t));
+        
             %% Compute regret
             delta_k = max(Env1_1.*Env1_2)*max(Env2) - (Env1_1.*Env1_2)'.*Env2;
             regret(t) = sum((delta_k).*T, 'all');
@@ -116,11 +137,11 @@ function [reward, regret, asympregret, i, timer] = OSUB_iter(Env1_1, Env1_2, Env
             end
             %}
     end
-    
+    %end
     
    % [~,opt_b] = max(mu(init_k,:));
     
-    for t = K1+K2+1:Time
+    for t = K1+K2*round(log(Time))+1:Time
     
         
         %if t > 1
@@ -141,6 +162,7 @@ function [reward, regret, asympregret, i, timer] = OSUB_iter(Env1_1, Env1_2, Env
         sl = (l(Li(t))-1)/(gamma+1);
         %sl = (l(L(t)))/(gamma+1);
         
+        %% OSUB on beam selection
         if sl>=1 && floor(sl)==sl
             i(t) = Li(t);
         else
@@ -156,7 +178,7 @@ function [reward, regret, asympregret, i, timer] = OSUB_iter(Env1_1, Env1_2, Env
 
         end
         
-        
+        %% 2-lvl feedback algorithm on rate selection
         switch alg
             case "KLUCB"
                 k(t) = F_KLUCB_2lv(mu1(:,i(t)),mu2(:,i(t)),T(:,i(t)),t);
