@@ -1,4 +1,4 @@
-function [reward, regret, asympregret, i, timer] = OSUB_iter(Env1_1, Env1_2, Env2, gamma, Time, alg)
+function [reward, regret, asympregret, i, timer] = OSUB_iter_alt(Env1_1, Env1_2, Env2, gamma, Time, alg)
     
     Env = (Env1_1.*Env1_2)'.*Env2;
 
@@ -66,7 +66,7 @@ function [reward, regret, asympregret, i, timer] = OSUB_iter(Env1_1, Env1_2, Env
             regret(t) = sum((delta_k).*T, 'all');
             %regret(t) = (t*max(Env1_1.*Env1_2)*max(Env2)) - sum(reward);
     end
-    %end
+   % end
     mI = find(mu(init_k,:) == max(mu(init_k,:)));
     init_i = mI(randi(length(mI)));         % Randomly pick one of the max
     %[~,init_i] = max(mu(init_k,:));
