@@ -6,7 +6,7 @@ function [reward, regret, asympregret, i, timer] = OSUB_iter_alt(Env1_1, Env1_2,
     Li = zeros(Time,1);  %L(1) = randi(K);
     mu = zeros(K1,K2); mu1 = zeros(K1,K2);
     mu2 = zeros(K1,K2);
-    l = zeros(1,K2);
+    l = zeros(K1,K2);
     T = zeros(K1,K2);  
     S = zeros(K1,K2);    F = zeros(K1,K2);
     S1 = zeros(K1,K2);    F1 = zeros(K1,K2);
@@ -116,52 +116,71 @@ function [reward, regret, asympregret, i, timer] = OSUB_iter_alt(Env1_1, Env1_2,
     
     for t = K1+K2+1:Time
     
+        %if t > 1
+        [~,L_temp] = max(mu, [], 'all', 'linear');
+        [L(t,1),L(t,2)] = ind2sub([K1,K2],L_temp);
+        % end
+
+        l(L(t,1),L(t,2)) = l(L(t,1),L(t,2)) + 1;
+        % Threshold for determining to choose current leader or not
+        sl = (l(L(t,1),L(t,2))-1)/(gamma+1);
+        %sl = (l(L(t)))/(gamma+1);
         
+        if sl>=1 && floor(sl)==sl
+            k(t) = L(t,1);
+            i(t) = L(t,2);
+        else
+            if L(t,1)>1 && L(t,1)<K1
+                N1 = [(L(t,1)-1):(L(t,1)+1)];
+                %corner1 = [1 3];
+            elseif L(t,1)==K1
+                N1 = [L(t,1)-1:L(t,1)];
+                %corner1 = [1];
+            else
+                N1 = [L(t,1):L(t,1)+1];
+                %corner1 = [2];
+            end
+
+            if L(t,2)>1 && L(t,2)<K2
+                N2 = [(L(t,2)-1):(L(t,2)+1)];
+                %corner2 = [1 3];
+            elseif L(t,2)==K2
+                N2 = [L(t,2)-1 L(t,2)];
+                %corner2 = [1];
+            else
+                N2 = [L(t,2) L(t,2)+1];
+                %corner2 = [2];
+            end
+        
+            S_N = S(L(t,1),N2);  F_N = F(L(t,1),N2);
+            T_N = T(L(t,1),N2);  mu_N = mu(L(t,1),N2);
+        
+        
+        %% OSUB on beam selection
+       
+            
+            switch alg
+            case "KLUCB"
+                i(t) = N2(1)-1+F_KLUCB(mu(L(t,1),N2),T(L(t,1),N2),l(L(t,1),L(t,2)));
+            case "UCB"
+                i(t) = N2(1)-1+F_UCB(mu(L(t,1),N2),T(L(t,1),N2),1/(Time)^2);
+            case "TS"
+                i(t) = N2(1)-1+F_TS(S(L(t,1),N2),F(L(t,1),N2));
+            end
+
+        end
         
         
         %% 2-lvl feedback algorithm on rate selection
         switch alg
             case "KLUCB"
-                k(t) = F_KLUCB_2lv(mu1(:,i(t-1)),mu2(:,i(t-1)),T(:,i(t-1)),t);
+                k(t) = F_KLUCB_2lv(mu1(:,L(t,2)),mu2(:,L(t,2)),T(:,L(t,2)),t);
             case "UCB"
-                k(t) = F_UCB_2lv(mu1(:,i(t-1)),mu2(:,i(t-1)),T(:,i(t-1)),1/(Time)^2);
+                k(t) = F_UCB_2lv(mu1(:,L(t,2)),mu2(:,L(t,2)),T(:,L(t,2)),1/(Time)^2);
             case "TS"
-                k(t) = F_TS_2lv(S1(:,i(t-1)),S2(:,i(t-1)),F1(:,i(t-1)),F2(:,i(t-1)));
+                k(t) = F_TS_2lv(S1(:,L(t,2)),S2(:,L(t,2)),F1(:,L(t,2)),F2(:,L(t,2)));
         end
-
-        
-        %% OSUB on beam selection
-        %if t > 1
-        [~,Li_temp] = max(mu, [], 'all', 'linear');
-        [~,Li(t)] = ind2sub([K1,K2],Li_temp);
-        % end
-        l(Li(t)) = l(Li(t)) + 1;
-        
-        if Li(t)>1 && Li(t)<K2
-            N = [(Li(t)-1):(Li(t)+1)];
-        elseif Li(t,1)==K2
-            N = [Li(t)-1:Li(t)];
-        else
-            N = [Li(t):Li(t)+1];
-        end
-        
-        % Threshold for determining to choose current leader or not
-        sl = (l(Li(t))-1)/(gamma+1);
-        %sl = (l(L(t)))/(gamma+1);
-        if sl>=1 && floor(sl)==sl
-            i(t) = Li(t);
-        else
-            
-            switch alg
-            case "KLUCB"
-                i(t) = N(1)-1+F_KLUCB(mu(k(t),N),T(k(t),N),l(Li(t)));
-            case "UCB"
-                i(t) = N(1)-1+F_UCB(mu(k(t),N),T(k(t),N),1/(Time)^2);
-            case "TS"
-                i(t) = N(1)-1+F_TS(S(k(t),N),F(k(t),N));
-            end
-
-        end
+        %L(t,2) or i(t)?
         
         X = rand() < Env1_1(k(t));
         Y = rand() < Env1_2(k(t))*Env2(i(t));
