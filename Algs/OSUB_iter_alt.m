@@ -122,14 +122,15 @@ function [reward, regret, asympregret, i, timer] = OSUB_iter_alt(Env1_1, Env1_2,
         % end
 
         l(L(t,1),L(t,2)) = l(L(t,1),L(t,2)) + 1;
-        % Threshold for determining to choose current leader or not
+        % Condition for choosing current leader or not
         sl = (l(L(t,1),L(t,2))-1)/(gamma+1);
         %sl = (l(L(t)))/(gamma+1);
         
         if sl>=1 && floor(sl)==sl
-            k(t) = L(t,1);
+            %k(t) = L(t,1);
             i(t) = L(t,2);
         else
+        %{
             if L(t,1)>1 && L(t,1)<K1
                 N1 = [(L(t,1)-1):(L(t,1)+1)];
                 %corner1 = [1 3];
@@ -140,7 +141,7 @@ function [reward, regret, asympregret, i, timer] = OSUB_iter_alt(Env1_1, Env1_2,
                 N1 = [L(t,1):L(t,1)+1];
                 %corner1 = [2];
             end
-
+        %}
             if L(t,2)>1 && L(t,2)<K2
                 N2 = [(L(t,2)-1):(L(t,2)+1)];
                 %corner2 = [1 3];
@@ -157,8 +158,7 @@ function [reward, regret, asympregret, i, timer] = OSUB_iter_alt(Env1_1, Env1_2,
         
         
         %% OSUB on beam selection
-       
-            
+  
             switch alg
             case "KLUCB"
                 i(t) = N2(1)-1+F_KLUCB(mu(L(t,1),N2),T(L(t,1),N2),l(L(t,1),L(t,2)));
