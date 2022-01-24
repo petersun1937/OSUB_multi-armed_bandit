@@ -77,11 +77,13 @@ function [reward, regret, asympregret, k, timer] = OSUB_2dim_2lv(Env1_1, Env1_2,
         l(L(t,1),L(t,2)) = l(L(t,1),L(t,2)) + 1;
 
         if L(t,1)>1 && L(t,1)<K1
-            N1 = [(L(t,1)-1):(L(t,1)+1)];
+            N1 = [1:(L(t,1)+1)];
             corner1 = [1 3];
-        elseif L(t,1)==K1
+        elseif L(t,1)==K1 && K1~=1
             N1 = [L(t,1)-1:L(t,1)];
             corner1 = [1];
+        elseif K1==1
+            N1 = 1;
         else
             N1 = [L(t,1):L(t,1)+1];
             corner1 = [2];
@@ -90,9 +92,11 @@ function [reward, regret, asympregret, k, timer] = OSUB_2dim_2lv(Env1_1, Env1_2,
         if L(t,2)>1 && L(t,2)<K2
             N2 = [(L(t,2)-1):(L(t,2)+1)];
             corner2 = [1 3];
-        elseif L(t,2)==K2
+        elseif L(t,2)==K2 && K2~=1
             N2 = [L(t,2)-1 L(t,2)];
             corner2 = [1];
+        elseif K2==1
+            N2 = 1;
         else
             N2 = [L(t,2) L(t,2)+1];
             corner2 = [2];

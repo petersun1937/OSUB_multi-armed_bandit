@@ -4,21 +4,24 @@ addpath('Funcs')
 addpath('Utilities')
 
 %% Sim Setup
-setup = 'sim6';
+
+setup = "sim1";
 
 switch setup
     case 'sim1'
         % 1st setup
         Rate = [2 3 5 6 9];
         PredProb = [0.1 0.3 0.5 0.65 0.9];
-        TranProb = [0.99 0.6 0.4 0.2 0.05];  
+        TranProbr = [0.99 0.6 0.4 0.2 0.05];  
         % Avgthruput = [0.198 0.54 1 0.78 0.405]
+        TranProbb = 1;
     case 'sim2'
        % 2nd setup
-        Rate = [2 3 8 10 11]; 
-        PredProb = [0.01 0.08 0.8 0.88 0.95];
-        TranProb = [0.99 0.9 0.85 0.15 0.05];
+        Beam = [1 2 3 4 5 6 7 8 9]; 
+        TranProbb = [0.1:0.2:0.9 0.7:-0.2:0.1];
         % Avgthruput = [0.0198 0.216 5.44 1.32 0.5225]
+        PredProb = 1;
+        TranProbr = 1;  
     case 'sim3'
        % 3rd setup (w/ beam selection)
         Rate = [2 3 5 6 9]; 
@@ -110,19 +113,19 @@ for trial = 1:Num_Trials
     %[UCB_X, UCB_reg, UCB_areg, UCB_Arm, timer3] = OSUB_2dim(PredProb, TranProbr, TranProbb, 4, T, "UCB");
 
     %% OSUB-two-level
-    %[TS_X, TS_reg, TS_areg, TS_Arm, timer1] = OSUB_2dim_2lv(PredProb, TranProbr, TranProbb, 4, T, "TS");
-    %[KL_X, KL_reg, KL_areg, KL_Arm, timer2] = OSUB_2dim_2lv(PredProb, TranProbr, TranProbb, 4, T, "KLUCB");  
-    %[UCB_X, UCB_reg, UCB_areg, UCB_Arm, timer3] = OSUB_2dim_2lv(PredProb, TranProbr, TranProbb, 4, T, "UCB");
+    [TS_X, TS_reg, TS_areg, TS_Arm, timer1] = OSUB_2dim_2lv(PredProb, TranProbr, TranProbb, 4, T, "TS");
+    [KL_X, KL_reg, KL_areg, KL_Arm, timer2] = OSUB_2dim_2lv(PredProb, TranProbr, TranProbb, 4, T, "KLUCB");  
+    [UCB_X, UCB_reg, UCB_areg, UCB_Arm, timer3] = OSUB_2dim_2lv(PredProb, TranProbr, TranProbb, 4, T, "UCB");
     
     
     %% OSUB iter
-    [TS_X, TS_reg, TS_areg, TS_Arm, timer1] = OSUB_iter_alt(PredProb, TranProbr, TranProbb, 2, T, "TS");
-    [KL_X, KL_reg, KL_areg, KL_Arm, timer2] = OSUB_iter_alt(PredProb, TranProbr, TranProbb, 2, T, "KLUCB");  
-    [UCB_X, UCB_reg, UCB_areg, UCB_Arm, timer3] = OSUB_iter_alt(PredProb, TranProbr, TranProbb, 2, T, "UCB");
+    %[TS_X, TS_reg, TS_areg, TS_Arm, timer1] = OSUB_iter_alt(PredProb, TranProbr, TranProbb, 2, T, "TS");
+    %[KL_X, KL_reg, KL_areg, KL_Arm, timer2] = OSUB_iter_alt(PredProb, TranProbr, TranProbb, 2, T, "KLUCB");  
+    %[UCB_X, UCB_reg, UCB_areg, UCB_Arm, timer3] = OSUB_iter_alt(PredProb, TranProbr, TranProbb, 2, T, "UCB");
     
     
     %% Classic
-   % [TS_X, TS_reg, TS_areg, TS_Arm, timer1] = Classic_2dim(PredProb, TranProbr, TranProbb, T, "TS");
+    %[TS_X, TS_reg, TS_areg, TS_Arm, timer1] = Classic_2dim(PredProb, TranProbr, TranProbb, T, "TS");
     %[KL_X, KL_reg, KL_areg, KL_Arm, timer2] = Classic_2dim(PredProb, TranProbr, TranProbb, T, "KLUCB");  
     %[UCB_X, UCB_reg, UCB_areg, UCB_Arm, timer3] = Classic_2dim(PredProb, TranProbr, TranProbb, T, "UCB");
    

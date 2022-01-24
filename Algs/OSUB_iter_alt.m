@@ -145,12 +145,15 @@ function [reward, regret, asympregret, i, timer] = OSUB_iter_alt(Env1_1, Env1_2,
             if L(t,2)>1 && L(t,2)<K2
                 N2 = [(L(t,2)-1):(L(t,2)+1)];
                 %corner2 = [1 3];
-            elseif L(t,2)==K2
+            elseif L(t,2)==K2 && K2~=1
                 N2 = [L(t,2)-1 L(t,2)];
                 %corner2 = [1];
+            elseif K2==1
+                N2 = 1;
             else
                 N2 = [L(t,2) L(t,2)+1];
                 %corner2 = [2];
+                
             end
         
             S_N = S(L(t,1),N2);  F_N = F(L(t,1),N2);
