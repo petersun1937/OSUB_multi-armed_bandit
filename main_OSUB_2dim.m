@@ -5,7 +5,7 @@ addpath('Utilities')
 
 %% Sim Setup
 
-setup = "sim1";
+setup = "sim5";
 
 switch setup
     case 'sim1'
@@ -85,7 +85,7 @@ AvgThruputr = PredProb.*TranProbr;
 AvgThruputb = TranProbb; 
 
 T = 10e3;               % Time horizon
-Num_Trials = 100;
+Num_Trials = 10;
 
 %% Initialization
 KL_SelectedArms       = [];   UCB_SelectedArms       = [];
