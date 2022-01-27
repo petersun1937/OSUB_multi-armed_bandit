@@ -5,7 +5,7 @@ addpath('Utilities')
 
 %% Sim Setup
 
-setup = "sim5";
+setup = "sim2";
 
 switch setup
     case 'sim1'
@@ -85,7 +85,7 @@ AvgThruputr = PredProb.*TranProbr;
 AvgThruputb = TranProbb; 
 
 T = 10e3;               % Time horizon
-Num_Trials = 10;
+Num_Trials = 100;
 
 %% Initialization
 KL_SelectedArms       = [];   UCB_SelectedArms       = [];
@@ -108,14 +108,14 @@ for trial = 1:Num_Trials
     disp(trial)
 
     %% OSUB
-    %[TS_X, TS_reg, TS_areg, TS_Arm, timer1] = OSUB_2dim(PredProb, TranProbr, TranProbb, 4, T, "TS");
-    %[KL_X, KL_reg, KL_areg, KL_Arm, timer2] = OSUB_2dim(PredProb, TranProbr, TranProbb, 4, T, "KLUCB");  
-    %[UCB_X, UCB_reg, UCB_areg, UCB_Arm, timer3] = OSUB_2dim(PredProb, TranProbr, TranProbb, 4, T, "UCB");
+    [TS_X, TS_reg, TS_areg, TS_Arm, timer1] = OSUB_2dim(PredProb, TranProbr, TranProbb, 2, T, "TS");
+    [KL_X, KL_reg, KL_areg, KL_Arm, timer2] = OSUB_2dim(PredProb, TranProbr, TranProbb, 2, T, "KLUCB");  
+    [UCB_X, UCB_reg, UCB_areg, UCB_Arm, timer3] = OSUB_2dim(PredProb, TranProbr, TranProbb, 2, T, "UCB");
 
     %% OSUB-two-level
-    [TS_X, TS_reg, TS_areg, TS_Arm, timer1] = OSUB_2dim_2lv(PredProb, TranProbr, TranProbb, 4, T, "TS");
-    [KL_X, KL_reg, KL_areg, KL_Arm, timer2] = OSUB_2dim_2lv(PredProb, TranProbr, TranProbb, 4, T, "KLUCB");  
-    [UCB_X, UCB_reg, UCB_areg, UCB_Arm, timer3] = OSUB_2dim_2lv(PredProb, TranProbr, TranProbb, 4, T, "UCB");
+    %[TS_X, TS_reg, TS_areg, TS_Arm, timer1] = OSUB_2dim_2lv(PredProb, TranProbr, TranProbb, 4, T, "TS");
+    %[KL_X, KL_reg, KL_areg, KL_Arm, timer2] = OSUB_2dim_2lv(PredProb, TranProbr, TranProbb, 4, T, "KLUCB");  
+    %[UCB_X, UCB_reg, UCB_areg, UCB_Arm, timer3] = OSUB_2dim_2lv(PredProb, TranProbr, TranProbb, 4, T, "UCB");
     
     
     %% OSUB iter

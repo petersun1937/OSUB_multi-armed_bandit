@@ -106,9 +106,9 @@ function [reward, regret, asympregret, k, timer] = OSUB_2dim_2lv(Env1_1, Env1_2,
         sl = (l(L(t,1),L(t,2))-1)/(gamma+1);
         %sl = (l(L(t)))/(gamma+1);
         
-        %if sl>=1 && floor(sl)==sl
-        %    k(t,:) = L(t,:);
-       % else
+        if sl>=1 && floor(sl)==sl
+            k(t,:) = L(t,:);
+        else
             S1_N = S1(N1,N2);  F1_N = F1(N1,N2);
             S2_N = S2(N1,N2);  F2_N = F2(N1,N2);
             T_N = T(N1,N2);  mu1_N = mu1(N1,N2); mu2_N = mu2(N1,N2);
@@ -158,7 +158,7 @@ function [reward, regret, asympregret, k, timer] = OSUB_2dim_2lv(Env1_1, Env1_2,
             
         %}
             
-        %end
+        end
         
         X = rand() < Env1_1(k(t,1));
         Y = rand() < Env1_2(k(t,1))*Env2(k(t,2));
