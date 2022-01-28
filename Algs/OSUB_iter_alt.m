@@ -82,10 +82,10 @@ function [reward, regret, asympregret, i, timer] = OSUB_iter_alt(Env1_1, Env1_2,
         sl = (l(L(t,1),L(t,2))-1)/(gamma+1);
         %sl = (l(L(t)))/(gamma+1);
         
-        %if sl>=1 && floor(sl)==sl
-            %  %k(t) = L(t,1);
-        %    i(t) = L(t,2);
-        %else
+        if sl>=1 && floor(sl)==sl
+              k(t) = L(t,1);
+            i(t) = L(t,2);
+        else
         %{
             if L(t,1)>1 && L(t,1)<K1
                 N1 = [(L(t,1)-1):(L(t,1)+1)];
@@ -127,7 +127,7 @@ function [reward, regret, asympregret, i, timer] = OSUB_iter_alt(Env1_1, Env1_2,
                 i(t) = N2(1)-1+F_TS(S(L(t,1),N2),F(L(t,1),N2));
             end
 
-        %end
+        end
         
         
         %% 2-lvl feedback algorithm on rate selection
