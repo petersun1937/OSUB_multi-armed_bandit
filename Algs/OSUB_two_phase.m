@@ -25,12 +25,12 @@ function [reward, regret, asympregret, i, timer] = OSUB_two_phase(Env1_1, Env1_2
     tic;
     t=0;
     init_k = ceil(K1/2);
-    explot = round(log(Time)); % exploration time (or round(log(Time)))
+    explrt = ceil(log(log(Time))); % exploration time (or ceil(log(Time)))
     phase1end = Time/2;
     
     for ii= 1:K2
         for j=1:K1
-            for tt=1:explot
+            for tt=1:explrt
             i = [i;ii];
             k = [k; j];
             t=t+1;
@@ -73,7 +73,7 @@ function [reward, regret, asympregret, i, timer] = OSUB_two_phase(Env1_1, Env1_2
     
    % [~,opt_b] = max(mu(init_k,:));
     
-    for t = K1*K2*explot+1:phase1end
+    for t = K1*K2*explrt+1:phase1end
     
         %if t > 1
         [~,L_temp] = max(mu, [], 'all', 'linear');

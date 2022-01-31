@@ -84,8 +84,8 @@ end
 AvgThruputr = PredProb.*TranProbr; 
 AvgThruputb = TranProbb; 
 
-T = 15e3;               % Time horizon
-Num_Trials = 50;
+T = 10e3;               % Time horizon
+Num_Trials = 100;
 
 %% Initialization
 KL_SelectedArms       = [];   UCB_SelectedArms       = [];
