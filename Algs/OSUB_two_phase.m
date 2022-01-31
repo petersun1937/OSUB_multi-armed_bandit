@@ -26,7 +26,7 @@ function [reward, regret, asympregret, i, timer] = OSUB_two_phase(Env1_1, Env1_2
     t=0;
     init_k = ceil(K1/2);
     explot = round(log(Time)); % exploration time (or round(log(Time)))
-    phase1end = Time/3;
+    phase1end = Time/2;
     
     for ii= 1:K2
         for j=1:K1

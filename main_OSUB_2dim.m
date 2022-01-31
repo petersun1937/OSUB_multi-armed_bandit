@@ -5,7 +5,7 @@ addpath('Utilities')
 
 %% Sim Setup
 
-setup = "sim5";
+setup = "sim6";
 
 switch setup
     case 'sim1'
