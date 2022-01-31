@@ -5,7 +5,7 @@ addpath('Utilities')
 
 %% Sim Setup
 
-setup = "sim4";
+setup = "sim5";
 
 switch setup
     case 'sim1'
@@ -84,8 +84,8 @@ end
 AvgThruputr = PredProb.*TranProbr; 
 AvgThruputb = TranProbb; 
 
-T = 10e3;               % Time horizon
-Num_Trials = 100;
+T = 15e3;               % Time horizon
+Num_Trials = 50;
 
 %% Initialization
 KL_SelectedArms       = [];   UCB_SelectedArms       = [];
@@ -118,7 +118,7 @@ for trial = 1:Num_Trials
     %[UCB_X, UCB_reg, UCB_areg, UCB_Arm, timer3] = OSUB_2dim_2lv(PredProb, TranProbr, TranProbb, 4, T, "UCB");
     
     
-    %% OSUB iter
+    %% OSUB alt
     [TS_X, TS_reg, TS_areg, TS_Arm, timer1] = OSUB_two_phase(PredProb, TranProbr, TranProbb, 2, T, "TS");
     [KL_X, KL_reg, KL_areg, KL_Arm, timer2] = OSUB_two_phase(PredProb, TranProbr, TranProbb, 2, T, "KLUCB");  
     [UCB_X, UCB_reg, UCB_areg, UCB_Arm, timer3] = OSUB_two_phase(PredProb, TranProbr, TranProbb, 2, T, "UCB");

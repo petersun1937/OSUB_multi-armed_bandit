@@ -25,54 +25,55 @@ function [reward, regret, asympregret, i, timer] = OSUB_two_phase(Env1_1, Env1_2
     tic;
     t=0;
     init_k = ceil(K1/2);
-    logn = round(log(Time));
+    explot = round(log(Time)); % exploration time (or round(log(Time)))
+    phase1end = Time/3;
     
     for ii= 1:K2
         for j=1:K1
-            for tt=1:3
-        i = [i;ii];
-        k = [k; j];
-        t=t+1;
+            for tt=1:explot
+            i = [i;ii];
+            k = [k; j];
+            t=t+1;
 
-        X = rand() < Env1_1(k(t));
-        Y = rand() < Env1_2(k(t))*Env2(i(t));
-        Z = X*Y;
-        
-        reward = [reward Z];
+            X = rand() < Env1_1(k(t));
+            Y = rand() < Env1_2(k(t))*Env2(i(t));
+            Z = X*Y;
 
-        T(k(t),i(t)) = T(k(t),i(t)) + 1;
+            reward = [reward Z];
 
-        S(k(t),i(t)) = S(k(t),i(t)) + Z;
-        F(k(t),i(t)) = F(k(t),i(t)) + ~Z;
-       % mu_h = S./T;
-       % ExpectedMeans(Is) = (ExpectedMeans(Is)*T(Is) + reward)./(T(Is)+1);
-        mu(k(t),i(t)) = (S(k(t),i(t)))./T(k(t),i(t));
-        
-        
-        
-        %% Compute regret
-        regret(t) = sum((max(Env1_1.*Env1_2)*max(Env2) - (Env1_1.*Env1_2)'.*Env2).*T, 'all');
-        %regret(t) = (t*max(Env1_1.*Env1_2)*max(Env2)) - sum(reward);
-        %{
-        if t>1
-            regret(t) = regret(t-1) + (max(Env1_1)*max(Env1_2)*max(Env2) - Env1_1(k(t,1))*Env1_2(k(t,1))*Env2(k(t,2)));
-            %regret(t) = regret(t-1) + sum((max(Env1_1.*Env1_2)*max(Env2) - Env).*T, 'all')/t;
-            %regret(t) = regret(t-1) + (max(Env1_1.*Env1_2)*max(Env2) - mean(reward,2));
+            T(k(t),i(t)) = T(k(t),i(t)) + 1;
+
+            S(k(t),i(t)) = S(k(t),i(t)) + Z;
+            F(k(t),i(t)) = F(k(t),i(t)) + ~Z;
+           % mu_h = S./T;
+           % ExpectedMeans(Is) = (ExpectedMeans(Is)*T(Is) + reward)./(T(Is)+1);
+            mu(k(t),i(t)) = (S(k(t),i(t)))./T(k(t),i(t));
+
+
+
+            %% Compute regret
+            regret(t) = sum((max(Env1_1.*Env1_2)*max(Env2) - (Env1_1.*Env1_2)'.*Env2).*T, 'all');
             %regret(t) = (t*max(Env1_1.*Env1_2)*max(Env2)) - sum(reward);
-        else
-            regret(1) = (max(Env1_1)*max(Env1_2)*max(Env2) - Env1_1(k(t,1))*Env1_2(k(t,1))*Env2(k(t,2)));
-            %regret(1) = sum((max(Env1_1.*Env1_2)*max(Env2) - Env).*T, 'all')/t;
-            %regret(1) = max(Env1_1.*Env1_2)*max(Env2) - mean(reward,2);
-            %regret(t) = t*max(Env1_1.*Env1_2)*max(Env2) - sum(reward);
-        end
-        %}
+            %{
+            if t>1
+                regret(t) = regret(t-1) + (max(Env1_1)*max(Env1_2)*max(Env2) - Env1_1(k(t,1))*Env1_2(k(t,1))*Env2(k(t,2)));
+                %regret(t) = regret(t-1) + sum((max(Env1_1.*Env1_2)*max(Env2) - Env).*T, 'all')/t;
+                %regret(t) = regret(t-1) + (max(Env1_1.*Env1_2)*max(Env2) - mean(reward,2));
+                %regret(t) = (t*max(Env1_1.*Env1_2)*max(Env2)) - sum(reward);
+            else
+                regret(1) = (max(Env1_1)*max(Env1_2)*max(Env2) - Env1_1(k(t,1))*Env1_2(k(t,1))*Env2(k(t,2)));
+                %regret(1) = sum((max(Env1_1.*Env1_2)*max(Env2) - Env).*T, 'all')/t;
+                %regret(1) = max(Env1_1.*Env1_2)*max(Env2) - mean(reward,2);
+                %regret(t) = t*max(Env1_1.*Env1_2)*max(Env2) - sum(reward);
+            end
+            %}
             end
         end
     end
     
    % [~,opt_b] = max(mu(init_k,:));
     
-    for t = K1*K2+1:Time/2
+    for t = K1*K2*explot+1:phase1end
     
         %if t > 1
         [~,L_temp] = max(mu, [], 'all', 'linear');
@@ -170,11 +171,37 @@ function [reward, regret, asympregret, i, timer] = OSUB_two_phase(Env1_1, Env1_2
         %regret(t) = regret(t-1) + (max(Env1_1.*Env1_2)*max(Env2) - mean(reward,2));
         
     end
-    d = [k i];
-    
-    
-    for t = Time/2+1:Time
-        i(t) = i(Time/2);
+    %{
+    for j=1:K1
+        for tt=1:explot
+        i = [i;ii];
+        k = [k; j];
+        t=t+1;
+
+        X = rand() < Env1_1(k(t));
+        Y = rand() < Env1_2(k(t))*Env2(i(t));
+        Z = X*Y;
+        
+        reward = [reward Z];
+
+        T(k(t),i(t)) = T(k(t),i(t)) + 1;
+
+        S(k(t),i(t)) = S(k(t),i(t)) + Z;
+        F(k(t),i(t)) = F(k(t),i(t)) + ~Z;
+       % mu_h = S./T;
+       % ExpectedMeans(Is) = (ExpectedMeans(Is)*T(Is) + reward)./(T(Is)+1);
+        mu(k(t),i(t)) = (S(k(t),i(t)))./T(k(t),i(t));
+                
+        %% Compute regret
+        regret(t) = sum((max(Env1_1.*Env1_2)*max(Env2) - (Env1_1.*Env1_2)'.*Env2).*T, 'all');
+
+        end
+    end
+    %}
+    for t = phase1end+1:Time
+        i(t) = i(phase1end);
+        
+        
         %% 2-lvl feedback algorithm on rate selection
         switch alg
             case "KLUCB"
@@ -219,4 +246,6 @@ function [reward, regret, asympregret, i, timer] = OSUB_two_phase(Env1_1, Env1_2
         timer = [timer tend];
         
     end
+    d = [k i];
+   %}
 end
