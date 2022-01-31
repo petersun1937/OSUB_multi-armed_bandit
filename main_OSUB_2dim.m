@@ -5,7 +5,7 @@ addpath('Utilities')
 
 %% Sim Setup
 
-setup = "sim6";
+setup = "sim4";
 
 switch setup
     case 'sim1'
@@ -119,9 +119,9 @@ for trial = 1:Num_Trials
     
     
     %% OSUB iter
-    [TS_X, TS_reg, TS_areg, TS_Arm, timer1] = OSUB_iter_alt(PredProb, TranProbr, TranProbb, 2, T, "TS");
-    [KL_X, KL_reg, KL_areg, KL_Arm, timer2] = OSUB_iter_alt(PredProb, TranProbr, TranProbb, 2, T, "KLUCB");  
-    [UCB_X, UCB_reg, UCB_areg, UCB_Arm, timer3] = OSUB_iter_alt(PredProb, TranProbr, TranProbb, 2, T, "UCB");
+    [TS_X, TS_reg, TS_areg, TS_Arm, timer1] = OSUB_two_phase(PredProb, TranProbr, TranProbb, 2, T, "TS");
+    [KL_X, KL_reg, KL_areg, KL_Arm, timer2] = OSUB_two_phase(PredProb, TranProbr, TranProbb, 2, T, "KLUCB");  
+    [UCB_X, UCB_reg, UCB_areg, UCB_Arm, timer3] = OSUB_two_phase(PredProb, TranProbr, TranProbb, 2, T, "UCB");
     
     
     %% Classic
