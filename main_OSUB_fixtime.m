@@ -214,11 +214,11 @@ UCB_timer = [];
         UCB_fixregret{e} = [UCB_fixregret{e} UCB_reg(T)];
         TS_fixregret{e} = [TS_fixregret{e} TS_reg(T)];
     end
-    NumArms = [NumArms numel(AvgThruput{e})];
+    %NumArms = [NumArms numel(AvgThruput{e})];
     
-    [cumreg_U_UCB, std_U_UCB, CI95_U_UCB] = RegretAnalysis(AvgThruput{e}, UCB_regret{e}, Num_Trials);
-    [cumreg_U_KL, std_U_KL, CI95_U_KL] = RegretAnalysis(AvgThruput{e}, KL_regret{e}, Num_Trials);
-    [cumreg_U_TS, std_U_TS, CI95_U_TS] = RegretAnalysis(AvgThruput{e}, TS_regret{e}, Num_Trials);
+    [cumreg_UCB, std_UCB, CI95_UCB] = RegretAnalysis([], UCB_regret{e}, Num_Trials);
+    [cumreg_KL, std_KL, CI95_KL] = RegretAnalysis([], KL_regret{e}, Num_Trials);
+    [cumreg_TS, std_TS, CI95_TS] = RegretAnalysis([], TS_regret{e}, Num_Trials);
 
     %save("UCB_result.mat")
 
@@ -245,12 +245,12 @@ TS_fixregret =  mean(cell2mat(TS_fixregret),2);
 %% Compute and plot regret and statistics
 
 figure
-plot(NumArms, UCB_fixregret,'k', 'LineWidth',1.5);
+plot(1:Num_exp, UCB_fixregret,'k', 'LineWidth',1.5);
 hold on
-plot(NumArms,KL_fixregret,'r', 'LineWidth',1.5);
-plot(NumArms,TS_fixregret,'b', 'LineWidth',1.5);
+plot(1:Num_exp,KL_fixregret,'r', 'LineWidth',1.5);
+plot(1:Num_exp,TS_fixregret,'b', 'LineWidth',1.5);
 grid on
-xlabel('Number of arms')
+xlabel('Exploration Time')
 ylabel("Regret at time slot "+num2str(T))
 legend('UCB','KLUCB','Thompson Sampling')
 
