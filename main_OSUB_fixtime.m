@@ -4,7 +4,7 @@ addpath('Algs')
 addpath('Funcs')
 addpath('Utilities')
 
-setup = 'sim3-1';
+setup = 'sim3-6';
 
 T = 10e3;               % Time horizon
 Num_Trials = 100; 
@@ -115,7 +115,7 @@ Beam{4} = [1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17];
 TranProbb{4} = [0.1:0.1:0.9 0.85:-0.1:0.1];
 AvgThruput{4} = (PredProb{4}.*TranProbr{4})'.*TranProbb{4};
 
-case 'sim3-1'
+case 'sim3-6'
 
    % 6th setup (trans prob peaks at opt beam)
     Rate = [2 3 5 6 8]; 
@@ -128,6 +128,18 @@ case 'sim3-1'
 
     AvgThruput = (PredProb.*TranProbr)'.*TranProbb;
 
+case 'sim3-4'
+   % 4th setup (vertically not unimodal)
+    Rate = [2 3 5 6 8]; 
+
+    PredProb = [0.15 0.3 0.45 0.6 0.75];
+    TranProbr = [0.99 0.8 0.5 0.38 0.2];
+
+    Beam = [1 2 3 4 5 6 7 8 9];
+    TranProbb = [0.1:0.2:0.9 0.7:-0.2:0.1];
+
+    AvgThruput = (PredProb.*TranProbr)'.*TranProbb;
+        
 end
 
 %AvgThruput = normpdf(-2:0.05:4, 1, 1)*2;     %K=121, normal dist.
