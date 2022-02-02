@@ -88,8 +88,8 @@ T = 10e3;               % Time horizon
 Num_Trials = 100;
 
 %% Initialization
-KL_SelectedArms       = [];   UCB_SelectedArms       = [];
-TS_SelectedArms       = [];
+KL_SelectedArms       = cell(Num_Trials,1);   UCB_SelectedArms       = cell(Num_Trials,1);
+TS_SelectedArms       = cell(Num_Trials,1);
 
 KL_reward       = [];   UCB_reward       = [];
 TS_reward       = [];
@@ -119,9 +119,9 @@ for trial = 1:Num_Trials
     
     
     %% OSUB alt
-    [TS_X, TS_reg, TS_areg, TS_Arm, timer1] = OSUB_two_phase(PredProb, TranProbr, TranProbb, 2, T, "TS");
-    [KL_X, KL_reg, KL_areg, KL_Arm, timer2] = OSUB_two_phase(PredProb, TranProbr, TranProbb, 2, T, "KLUCB");  
-    [UCB_X, UCB_reg, UCB_areg, UCB_Arm, timer3] = OSUB_two_phase(PredProb, TranProbr, TranProbb, 2, T, "UCB");
+    [TS_X, TS_reg, TS_areg, TS_Arm, timer1] = OSUB_two_phase(PredProb, TranProbr, TranProbb, 2, T, "TS", 9);
+    [KL_X, KL_reg, KL_areg, KL_Arm, timer2] = OSUB_two_phase(PredProb, TranProbr, TranProbb, 2, T, "KLUCB", 9);  
+    [UCB_X, UCB_reg, UCB_areg, UCB_Arm, timer3] = OSUB_two_phase(PredProb, TranProbr, TranProbb, 2, T, "UCB", 9);
     
     
     %% Classic

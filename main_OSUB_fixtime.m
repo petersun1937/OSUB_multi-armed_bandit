@@ -4,11 +4,11 @@ addpath('Algs')
 addpath('Funcs')
 addpath('Utilities')
 
-setup = 'sim3-3';
+setup = 'sim3-6';
 
 T = 10e3;               % Time horizon
 Num_Trials = 100; 
-Num_exp = round(log(T));
+Num_exp = 12;   %round(log(T))
 
 switch setup
 %% One dim problem

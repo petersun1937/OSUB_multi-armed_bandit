@@ -1,4 +1,4 @@
-function [reward, regret, asympregret, i, timer] = OSUB_two_phase(Env1_1, Env1_2, Env2, gamma, Time, alg, m)
+function [reward, regret, asympregret, d, timer] = OSUB_two_phase(Env1_1, Env1_2, Env2, gamma, Time, alg, m)
     
     Env = (Env1_1.*Env1_2)'.*Env2;
 
@@ -71,20 +71,22 @@ function [reward, regret, asympregret, i, timer] = OSUB_two_phase(Env1_1, Env1_2
         end
     end
     
+    [~,L_temp] = max(mu, [], 'all', 'linear');
+    [k_p,~] = ind2sub([K1,K2],L_temp);
    % [~,opt_b] = max(mu(init_k,:));
     
     for t = K1*K2*m+1:phase1end
     
         %if t > 1
         [~,L_temp] = max(mu, [], 'all', 'linear');
-        [L(t,1),L(t,2)] = ind2sub([K1,K2],L_temp);
+        [~,L(t,2)] = ind2sub([K1,K2],L_temp);
         % end
 
-        l(L(t,1),L(t,2)) = l(L(t,1),L(t,2)) + 1;
+        l(k_p,L(t,2)) = l(k_p,L(t,2)) + 1;
         % Condition for choosing current leader or not
-        sl = (l(L(t,1),L(t,2))-1)/(gamma+1);
+        sl = (l(k_p,L(t,2))-1)/(gamma+1);
         %sl = (l(L(t)))/(gamma+1);
-        k(t) = L(t,1);
+        k(t) = k_p;
         
         if sl>=1 && floor(sl)==sl
             i(t) = L(t,2);
@@ -115,19 +117,19 @@ function [reward, regret, asympregret, i, timer] = OSUB_two_phase(Env1_1, Env1_2
                 
             end
         
-            S_N = S(L(t,1),N2);  F_N = F(L(t,1),N2);
-            T_N = T(L(t,1),N2);  mu_N = mu(L(t,1),N2);
+            S_N = S(k_p,N2);  F_N = F(k_p,N2);
+            T_N = T(k_p,N2);  mu_N = mu(k_p,N2);
         
         
         %% OSUB on beam selection
   
             switch alg
             case "KLUCB"
-                i(t) = N2(1)-1+F_KLUCB(mu(L(t,1),N2),T(L(t,1),N2),l(L(t,1),L(t,2)));
+                i(t) = N2(1)-1+F_KLUCB(mu(k_p,N2),T(k_p,N2),l(k_p,L(t,2)));
             case "UCB"
-                i(t) = N2(1)-1+F_UCB(mu(L(t,1),N2),T(L(t,1),N2),1/(Time)^2);
+                i(t) = N2(1)-1+F_UCB(mu(k_p,N2),T(k_p,N2),1/(Time)^2);
             case "TS"
-                i(t) = N2(1)-1+F_TS(S(L(t,1),N2),F(L(t,1),N2));
+                i(t) = N2(1)-1+F_TS(S(k_p,N2),F(k_p,N2));
             end
 
         end
