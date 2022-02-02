@@ -4,10 +4,11 @@ addpath('Algs')
 addpath('Funcs')
 addpath('Utilities')
 
-setup = 'sim1-3';
+setup = 'sim3-1';
 
 T = 10e3;               % Time horizon
-Num_Trials = 1000; 
+Num_Trials = 100; 
+Num_exp = round(log(T));
 
 switch setup
 %% One dim problem
@@ -113,30 +114,49 @@ TranProbr{4} = [0.99 0.6 0.4 0.2 0.05];
 Beam{4} = [1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17];
 TranProbb{4} = [0.1:0.1:0.9 0.85:-0.1:0.1];
 AvgThruput{4} = (PredProb{4}.*TranProbr{4})'.*TranProbb{4};
+
+case 'sim3-1'
+
+   % 6th setup (trans prob peaks at opt beam)
+    Rate = [2 3 5 6 8]; 
+
+    PredProb = [0.01 0.08 0.8 0.88 0.95];
+    TranProbr = [0.99 0.9 0.85 0.15 0.05];
+
+    Beam = [1 2 3 4 5 6 7 8 9];
+    TranProbb = [0.01 0.05 0.15 0.3 0.9 0.3 0.15 0.05 0.01];
+
+    AvgThruput = (PredProb.*TranProbr)'.*TranProbb;
+
 end
 
 %AvgThruput = normpdf(-2:0.05:4, 1, 1)*2;     %K=121, normal dist.
 
-KL_fixregret = cell(5,1);   UCB_fixregret = cell(5,1);
-TS_fixregret = cell(5,1);
+KL_fixregret = cell(Num_exp,1);   UCB_fixregret = cell(Num_exp,1);
+TS_fixregret = cell(Num_exp,1);
 NumArms = [];
 
-KL_regret = cell(5,1);   UCB_regret = cell(5,1);
-TS_regret = cell(5,1);
+KL_regret = cell(Num_exp,1);   UCB_regret = cell(Num_exp,1);
+TS_regret = cell(Num_exp,1);
 
+
+%KL_SelectedArms  = cell(Num_exp,1);   UCB_SelectedArms  = cell(Num_exp,1);
+%TS_SelectedArms  = cell(Num_exp,1);
+ 
+    
 %%
-for e=5:length(AvgThruput)
+for e=1:Num_exp
 
 disp("e")
 disp(e)
     
 %Env = AvgThruput{e};
 
-U_KL_SelectedArms       = [];   U_UCB_SelectedArms       = [];
-U_TS_SelectedArms       = [];
+KL_SelectedArms       = [];   UCB_SelectedArms       = [];
+TS_SelectedArms       = [];
 
-U_KL_timer = [];        U_TS_timer = [];   
-U_UCB_timer = [];  
+KL_timer = [];        TS_timer = [];   
+UCB_timer = [];  
 
 
 %% Run Algorithms for Num_Trials Times
@@ -144,9 +164,9 @@ U_UCB_timer = [];
         disp(trial)
 
         %% 1-dim OSUB
-        [~, KL_reg, KL_areg, KL_Arm, timer1] = OSUB(AvgThruput{e}, 2, T, "KLUCB");  
-        [~, UCB_reg, UCB_areg, UCB_Arm, timer2] = OSUB(AvgThruput{e}, 2, T, "UCB");
-        [~, TS_reg, TS_areg, TS_Arm, timer3] = OSUB(AvgThruput{e}, 2, T, "TS");
+        %[~, KL_reg, KL_areg, KL_Arm, timer1] = OSUB(AvgThruput{e}, 2, T, "KLUCB");  
+        %[~, UCB_reg, UCB_areg, UCB_Arm, timer2] = OSUB(AvgThruput{e}, 2, T, "UCB");
+        %[~, TS_reg, TS_areg, TS_Arm, timer3] = OSUB(AvgThruput{e}, 2, T, "TS");
 
         %% 1-dim Classic algs
         %[~, KL_reg, KL_areg, KL_Arm, timer1] = Classic(AvgThruput{e}, T, "KLUCB");  
@@ -154,9 +174,14 @@ U_UCB_timer = [];
         %[~, TS_reg, TS_areg, TS_Arm, timer3] = Classic(AvgThruput{e}, T, "TS");
 
         %% 2-dim OSUB
-        %[~, U_TS_reg, TS_areg, U_TS_Arm, timer1] = OSUB_TwoDim(PredProb{e}, TranProbr{e}, TranProbb{e}, 4, T, "TS");
-        %[~, U_KL_reg, KL_areg, U_KL_Arm, timer2] = OSUB_TwoDim(PredProb{e}, TranProbr{e}, TranProbb{e}, 4, T, "KLUCB");  
-        %[~, U_UCB_reg, UCB_areg, U_UCB_Arm, timer3] = OSUB_TwoDim(PredProb{e}, TranProbr{e}, TranProbb{e}, 4, T, "UCB");
+        %[~, TS_reg, TS_areg, TS_Arm, timer1] = OSUB_TwoDim(PredProb{e}, TranProbr{e}, TranProbb{e}, 4, T, "TS");
+        %[~, KL_reg, KL_areg, KL_Arm, timer2] = OSUB_TwoDim(PredProb{e}, TranProbr{e}, TranProbb{e}, 4, T, "KLUCB");  
+        %[~, UCB_reg, UCB_areg, UCB_Arm, timer3] = OSUB_TwoDim(PredProb{e}, TranProbr{e}, TranProbb{e}, 4, T, "UCB");
+        
+        %% OSUB alt
+        [TS_X, TS_reg, TS_areg, TS_Arm, timer1] = OSUB_two_phase(PredProb, TranProbr, TranProbb, 2, T, "TS", e);
+        [KL_X, KL_reg, KL_areg, KL_Arm, timer2] = OSUB_two_phase(PredProb, TranProbr, TranProbb, 2, T, "KLUCB", e);  
+        [UCB_X, UCB_reg, UCB_areg, UCB_Arm, timer3] = OSUB_two_phase(PredProb, TranProbr, TranProbb, 2, T, "UCB", e);
     
         %% 2-dim Classic
         %[~, TS_regret, ~, U_TS_Arm, timer1] = Classic_2dim(PredProb{e}, TranProbr{e}, TranProbb{e}, T, "TS");
@@ -164,30 +189,30 @@ U_UCB_timer = [];
         %[~, UCB_regret, ~, U_UCB_Arm, timer3] = Classic_2dim(PredProb{e}, TranProbr{e}, TranProbb{e}, T, "UCB");
         
         %% Update records
-        U_KL_SelectedArms       = [U_KL_SelectedArms; KL_Arm];
-        U_UCB_SelectedArms       = [U_UCB_SelectedArms; UCB_Arm];
-        U_TS_SelectedArms       = [U_TS_SelectedArms; TS_Arm];
+        KL_SelectedArms       = [KL_SelectedArms; KL_Arm];
+        UCB_SelectedArms       = [UCB_SelectedArms; UCB_Arm];
+        TS_SelectedArms       = [TS_SelectedArms; TS_Arm];
 
-       % U_KL_reward       = [U_KL_reward; U_KL_X];
-       % U_UCB_reward       = [U_UCB_reward; U_UCB_X];
-       % U_TS_reward       = [U_TS_reward; U_TS_X];
+        %KL_reward       = [KL_reward; KL_X];
+        %UCB_reward       = [UCB_reward; UCB_X];
+        %TS_reward       = [TS_reward; TS_X];
 
-        KL_regret{e}       = [KL_regret{e}; KL_reg];
-        UCB_regret{e}       = [UCB_regret{e}; UCB_reg];
-        TS_regret{e}       = [TS_regret{e}; TS_reg];
+        KL_regret       = [KL_regret; KL_reg];
+        UCB_regret       = [UCB_regret; UCB_reg];
+        TS_regret       = [TS_regret; TS_reg];
 
         %U_KL_mu_exp = (U_KL_mu + U_KL_mu_exp*(trial-1))/trial;
         %U_UCB_mu_exp = (U_UCB_mu + U_UCB_mu_exp*(trial-1))/trial;
         %U_TS_mu_exp = (U_TS_mu + U_TS_mu_exp*(trial-1))/trial;
 
 
-        U_KL_timer = [U_KL_timer; timer1];
-        U_UCB_timer = [U_UCB_timer; timer2];
-        U_TS_timer = [U_TS_timer; timer3];
+        %TS_timer = [TS_timer; timer1];
+        %KL_timer = [KL_timer; timer2];
+        %UCB_timer = [UCB_timer; timer3];
 
-        KL_fixregret{e} = [KL_fixregret{e} KL_areg(T)];
-        UCB_fixregret{e} = [UCB_fixregret{e} UCB_areg(T)];
-        TS_fixregret{e} = [TS_fixregret{e} TS_areg(T)];
+        KL_fixregret{e} = [KL_fixregret{e} KL_reg(T)];
+        UCB_fixregret{e} = [UCB_fixregret{e} UCB_reg(T)];
+        TS_fixregret{e} = [TS_fixregret{e} TS_reg(T)];
     end
     NumArms = [NumArms numel(AvgThruput{e})];
     
@@ -200,9 +225,9 @@ U_UCB_timer = [];
     %PlotRegret(regret_U_KL,std_U_KL,CI95_U_KL,"Single Feedback OSUB-KLUCB")
     %PlotRegret(regret_U_TS,std_U_TS,CI95_U_TS,"Single Feedback OSUB-TS")
 
-    PlotRegret3(cumreg_U_UCB,cumreg_U_KL,cumreg_U_TS,std_U_UCB,std_U_KL,std_U_TS,...
-        CI95_U_UCB,CI95_U_KL,CI95_U_TS,"UCB","KL-UCB","Thompson Sampling")
-    drawnow
+    %PlotRegret3(cumreg_U_UCB,cumreg_U_KL,cumreg_U_TS,std_U_UCB,std_U_KL,std_U_TS,...
+    %    CI95_U_UCB,CI95_U_KL,CI95_U_TS,"UCB","KL-UCB","Thompson Sampling")
+    %drawnow
     
 
 end
