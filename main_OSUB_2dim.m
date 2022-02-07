@@ -120,11 +120,14 @@ for trial = 1:Num_Trials
     
     %% OSUB alt
     
+    n1 = [0.1e3 0.3e3 0.7e3 1.5e3 3e3];
+    n2 = [0.2e3 0.5e3 1e3 2e3];
+    
     %n1 = [1 2e3 4e3 6e3 8e3];
     %n2 = [1e3 3e3 5e3 7e3 9e3];
     
-    n1 = [1 3e3 5e3 7e3 9e3];   % Time to enter phase 1
-    n2 = [2e3 4e3 6e3 8e3];     % Time to enter phase 2
+    %n1 = [1 3e3 5e3 7e3 9e3];   % Time to enter phase 1
+    %n2 = [2e3 4e3 6e3 8e3];     % Time to enter phase 2
     
     [TS_X, TS_reg, TS_areg, TS_Arm, timer1] = OSUB_multi_phase(PredProb, TranProbr, TranProbb, 2, T, "TS", n1, n2);
     [KL_X, KL_reg, KL_areg, KL_Arm, timer2] = OSUB_multi_phase(PredProb, TranProbr, TranProbb, 2, T, "KLUCB", n1, n2);  

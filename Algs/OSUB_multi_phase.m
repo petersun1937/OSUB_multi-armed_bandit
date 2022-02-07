@@ -26,7 +26,7 @@ function [reward, regret, asympregret, d, timer] = OSUB_multi_phase(Env1_1, Env1
     t=0;
     init_k = ceil(K1/2);
     %m = round(log(Time)); % exploration time: ceil(log(log(Time))) or round(log(Time)))
-    m = 2;
+    m = 1;
     
     for ii= 1:K2
         for j=1:K1
@@ -66,23 +66,29 @@ function [reward, regret, asympregret, d, timer] = OSUB_multi_phase(Env1_1, Env1
    
     for t = explr_t+1:Time
     
-        if(ismember(t,n1) && ~phase1)
+        if(ismember(t,n2) && ~phase1)
             phase1 = true;
-        elseif(ismember(t,n2) && phase1)
+            [~,L_temp] = max(mu, [], 'all', 'linear');
+            %[k(t),~] = ind2sub([K1,K2],L_temp);
+            k(t) = k(length(k));
+            
+        elseif(ismember(t,n1) && phase1)
             phase1 = false;
         end
         
+
+            
         if(phase1)      % Check if it should enter phase 1 or not
             %% Phase 1 (OSUB on beam selection)
-            %k(t) = k(length(k));
+            
             
             %if t > 1
             [~,L_temp] = max(mu, [], 'all', 'linear');
-            [L(t,1),L(t,2)] = ind2sub([K1,K2],L_temp);
+            [~,L(t,2)] = ind2sub([K1,K2],L_temp);
             % end
             
             % fix k 
-            k(t) = L(t,1);
+            k(t) = k(length(k));
             
             l(k(t),L(t,2)) = l(k(t),L(t,2)) + 1;
             
