@@ -13,6 +13,7 @@ legend(Alg1,Alg2,Alg3)
 %}
 
 % Plot Standard Deviation of all experiments
+%{
 figure
 plot(std1,'k', 'LineWidth',1.5);
 hold on

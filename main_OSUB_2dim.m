@@ -119,9 +119,16 @@ for trial = 1:Num_Trials
     
     
     %% OSUB alt
-    [TS_X, TS_reg, TS_areg, TS_Arm, timer1] = OSUB_two_phase(PredProb, TranProbr, TranProbb, 2, T, "TS", 9);
-    [KL_X, KL_reg, KL_areg, KL_Arm, timer2] = OSUB_two_phase(PredProb, TranProbr, TranProbb, 2, T, "KLUCB", 9);  
-    [UCB_X, UCB_reg, UCB_areg, UCB_Arm, timer3] = OSUB_two_phase(PredProb, TranProbr, TranProbb, 2, T, "UCB", 9);
+    
+    %n1 = [1 2e3 4e3 6e3 8e3];
+    %n2 = [1e3 3e3 5e3 7e3 9e3];
+    
+    n1 = [1 3e3 5e3 7e3 9e3];   % Time to enter phase 1
+    n2 = [2e3 4e3 6e3 8e3];     % Time to enter phase 2
+    
+    [TS_X, TS_reg, TS_areg, TS_Arm, timer1] = OSUB_multi_phase(PredProb, TranProbr, TranProbb, 2, T, "TS", n1, n2);
+    [KL_X, KL_reg, KL_areg, KL_Arm, timer2] = OSUB_multi_phase(PredProb, TranProbr, TranProbb, 2, T, "KLUCB", n1, n2);  
+    [UCB_X, UCB_reg, UCB_areg, UCB_Arm, timer3] = OSUB_multi_phase(PredProb, TranProbr, TranProbb, 2, T, "UCB", n1 ,n2);
     
     
     %% Classic
