@@ -74,6 +74,9 @@ function [reward, regret, asympregret, d, timer] = OSUB_multi_phase(Env1_1, Env1
             
         elseif(ismember(t,n1) && phase1)
             phase1 = false;
+            [~,L_temp] = max(mu, [], 'all', 'linear');
+            %[~,i(t)] = ind2sub([K1,K2],L_temp);
+            i(t) = i(length(i));
         end
         
 
