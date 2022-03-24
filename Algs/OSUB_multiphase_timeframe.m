@@ -1,10 +1,10 @@
-function [reward, regret, asympregret, d, timer] = OSUB_multi_phase(Env1, Env2, gamma, Time, alg, n1, n2)
+function [reward, regret, asympregret, d, timer] = OSUB_multiphase_timeframe(Env1, Env2, gamma, Time, alg, frame, OSUBt)
 
 
     Env = Env1'.*Env2;
     K1 = length(Env1);    K2 = length(Env2);
     
-    Li = zeros(Time,1);  %L(1) = randi(K);
+    %Li = zeros(Time,1);  %L(1) = randi(K);
     mu = zeros(K1,K2); mu1 = zeros(K1,K2);
     mu2 = zeros(K1,K2);
     l = zeros(K1,K2);
@@ -18,6 +18,7 @@ function [reward, regret, asympregret, d, timer] = OSUB_multi_phase(Env1, Env2, 
     
     i = [];
     k = [];
+    elimik = [];
     
     %regret = [];
     timer = [];         % timer
@@ -26,8 +27,8 @@ function [reward, regret, asympregret, d, timer] = OSUB_multi_phase(Env1, Env2, 
     tic;
     t=0;
     init_k = ceil(K1/2);
-    %m = round(log(Time)); % exploration time: ceil(log(log(Time))) or round(log(Time)))
-    m = 1;
+    %m = round(log(Time));  % exploration time: ceil(log(log(Time))) or round(log(Time)))
+    m = 2;
     
     for ii= 1:K2
         for j=1:K1
@@ -66,118 +67,140 @@ function [reward, regret, asympregret, d, timer] = OSUB_multi_phase(Env1, Env2, 
         end
     end
     explr_t = K1*K2*m;
-    n1 = n1+explr_t;
-    n2 = n2+explr_t;
     
     [Lmax,L_temp] = max(mu, [], 'all', 'linear');
     %mI = find(mu == Lmax);
     %L_temp = mI(randi(length(mI)));
     [k(explr_t+1),i(explr_t+1)] = ind2sub([K1,K2],L_temp);
    % [~,opt_b] = max(mu(init_k,:));
-    
-    phase1 = true;
    
+    %[~,L_temp] = max((mu2), [], 'all', 'linear');
+    %[~,i(explr_t+1)] = ind2sub([K1,K2],L_temp);
+    subphase=true;
+    nextOSUB=explr_t+1;
+    OSUBstart = [];
+    
     for t = explr_t+1:Time
     
-        if(ismember(t,n2) && ~phase1)
-            phase1 = true;
+        %if(rem(t+explr_t,nsub)==0)  % Run OSUB (and arm elimination)
+        if(t==nextOSUB)  % Run OSUB (and arm elimination)
             %[~,k(t)] = max(mu(:,i(length(i))), [], 'all', 'linear');
             [~,L_temp] =  max((mu), [], 'all', 'linear');
-            %[k(t),~] = ind2sub([K1,K2],L_temp);
-            k(t) = k(length(k));    % Fix rate (assigned earlier after exploration) 
-            [k(t),~] = max(T(:,i(t-1)));   % Fix the rate selected the most
+            [k(t),~] = ind2sub([K1,K2],L_temp);
+            %k(t) = k(length(k));           % Fix rate (assigned earlier after exploration) 
+            [~,k(t)] = max(T(:,i(t-1)));  
             
-        elseif(ismember(t,n1) && phase1)
-            phase1 = false;
+            [elk] = F_Median_Elim(mu(:,i(t-1)));
+            elkk = (i(t-1)-1)*K1+(elk);
+            
+            %elimik = [elimik; elk' ones(size(elk')).*i(t-1)];
+            elimik = [elimik; elkk];
+            
+            % Eliminate by setting it to nan
+            mu(elkk)=NaN;   mu1(elkk)=NaN;   mu2(elkk)=NaN;
+            
+            subphase=true;
+            subt = t+OSUBt;
+            if(subt-1<=Time)
+                k(t:subt-1)=k(t);
+            else
+                k(t:Time)=k(t);
+            end
+        elseif(subphase==true && t>=subt)           % Enters rate selection phase
+            subphase=false;
+            i(t) = i(length(i));
+            ratet=0;
+            nextOSUB=t+frame;
+        elseif(subphase==false)                     % Run rate selection
             %[~,i(t)] = max(mu(k(length(k)),:), [], 'all', 'linear');
-            [~,L_temp] = max((mu), [], 'all', 'linear');
+            [~,L_temp] = max((mu2), [], 'all', 'linear');
             %[~,i(t)] = ind2sub([K1,K2],L_temp);
-            
-            [~,i(t)] = max(T(k(t-1),:));   % Fix the beam selected the most
-            %i(t) = i(length(i));
+                        
+            i(t) = i(length(i));
         end
         
 
-            
-        if(phase1)      % Check if it should enter phase 1 or not
-            %% Phase 1 (OSUB on beam selection)
-            
-            %if t > 1
-            [Lmax,~] = max(mu(k(length(i)),:), [], 'all', 'linear');
-            mI = find(mu(k(length(i)),:) == Lmax);
-            L(t,2) = mI(randi(length(mI)));
-            %[~,L(t,2)] = ind2sub([K1,K2],L_temp);
-            % end
-            
-            % fix k 
-            k(t) = k(length(k));        % Keep selecting the fixed rate
-            
-            l(k(t),L(t,2)) = l(k(t),L(t,2)) + 1;
-            
-            % Condition for choosing current leader or not
-            sl = (l(k(t),L(t,2))-1)/(gamma+1);
-            %sl = (l(L(t)))/(gamma+1);
-            
-            %% OSUB on beam selection
-            
+        if (subphase)
+        %% OSUB on beam selection
+        
+        % fix k 
+        k(t) = k(length(k));
+
+        [Lmax,~] = max(mu2(k(t),:), [], 'all', 'linear');
+        mI = find(mu2(k(t),:) == Lmax);
+        L(t,2) = mI(randi(length(mI)));
+
+        l(k(t),L(t,2)) = l(k(t),L(t,2)) + 1;    % Update leader counters
+        
+        % Condition for choosing current leader or not
+        sl = (l(k(t),L(t,2))-1)/(gamma+1);
+        %sl = (l(L(t)))/(gamma+1);
+        
             if sl>=1 && floor(sl)==sl
                 i(t) = L(t,2);
             else
+                % Define neighborhood (based on the location of leader)
                 if L(t,2)>1 && L(t,2)<K2
                     N2 = [(L(t,2)-1):(L(t,2)+1)];
-                    %corner2 = [1 3];
                 elseif L(t,2)==K2 && K2~=1
                     N2 = [L(t,2)-1 L(t,2)];
-                    %corner2 = [1];
                 elseif K2==1
                     N2 = 1;
                 else
                     N2 = [L(t,2) L(t,2)+1];
-                    %corner2 = [2];
-
                 end
 
-                S_N = S(k(t),N2);  F_N = F(k(t),N2);
-                T_N = T(k(t),N2);  mu_N = mu(k(t),N2);
+                S_N = S2(k(t),N2);  F_N = F2(k(t),N2);
+                T_N = T(k(t),N2);  mu_N = mu2(k(t),N2);
 
-
+                % Apply algorithm for i(t)
                 switch alg
                 case "KLUCB"
-                    i(t) = N2(1)-1+F_KLUCB(mu(k(t),N2),T(k(t),N2),l(k(t),L(t,2)));
+                    i(t) = N2(1)-1+F_KLUCB(mu2(k(t),N2),T(k(t),N2),l(k(t),L(t,2)));
                 case "UCB"
-                    i(t) = N2(1)-1+F_UCB(mu(k(t),N2),T(k(t),N2),1/(t)^2);
+                    i(t) = N2(1)-1+F_UCB(mu2(k(t),N2),T(k(t),N2),1/(t)^2);
                 case "TS"
-                    i(t) = N2(1)-1+F_TS(S(k(t),N2),F(k(t),N2));
+                    i(t) = N2(1)-1+F_TS(S2(k(t),N2),F2(k(t),N2));
                 end
 
             end
-        else
-            %% Phase 2 (algorithm on rate selection)
-            
-            i(t) = i(length(i));        % Keep selecting the fixed beam
-            
-            switch alg
-                case "KLUCB"
-                    k(t) = F_KLUCB(mu(:,i(t)),T(:,i(t)),t);
-                case "UCB"
-                    k(t) = F_UCB(mu(:,i(t)),T(:,i(t)),1/(t)^2);
-                case "TS"
-                    k(t) = F_TS(S(:,i(t)),F(:,i(t)));
-            end
-            %}
-            %{
-            switch alg
-                case "KLUCB"
-                    k(t) = F_KLUCB_2lv(mu1(:,i(t)),mu2(:,i(t)),T(:,i(t)),t);
-                case "UCB"
-                    k(t) = F_UCB_2lv(mu1(:,i(t)),mu2(:,i(t)),T(:,i(t)),1/(Time)^2);
-                case "TS"
-                    k(t) = F_TS_2lv(S1(:,i(t)),S2(:,i(t)),F1(:,i(t)),F2(:,i(t)));
-            end
-            %}
-            %L(t,2) or i(t)?
- 
 
+        else
+        %% Algorithm on rate selection
+
+        switch alg
+            case "KLUCB"
+                k(t) = F_KLUCB(mu(:,i(t)),T(:,i(t)),t);
+            case "UCB"
+                k(t) = F_UCB(mu(:,i(t)),T(:,i(t)),1/(t)^2);
+            case "TS"
+                k(t) = F_TS(S(:,i(t)),F(:,i(t)));
+        end
+
+
+        %}
+        %{
+        switch alg
+            case "KLUCB"
+                k(t) = F_KLUCB_2lv(mu1(:,i(t)),mu2(:,i(t)),T(:,i(t)),t);
+            case "UCB"
+                k(t) = F_UCB_2lv(mu1(:,i(t)),mu2(:,i(t)),T(:,i(t)),1/(Time)^2);
+            case "TS"
+                k(t) = F_TS_2lv(S1(:,i(t)),S2(:,i(t)),F1(:,i(t)),F2(:,i(t)));
+        end
+        %}
+        
+        %% 
+        
+        if(ratet>=100 && mean(mu2(:,i(t)),'omitnan')<0.4)
+            nextOSUB = t+1;
+            OSUBstart = [OSUBstart; nextOSUB];
+        else
+            nextOSUB = t+frame;
+        end
+        %}
+        ratet=ratet+1;
+        
         end
         
         
@@ -216,7 +239,7 @@ function [reward, regret, asympregret, d, timer] = OSUB_multi_phase(Env1, Env2, 
         %regret(t) = regret(t-1) + (max(Env1_1.*Env1_2)*max(Env2) - mean(reward,2));
         
     end
-
+    
     d = [k i];
    
 end

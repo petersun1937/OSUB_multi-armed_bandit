@@ -30,8 +30,6 @@ function [reward, regret, asympregret, k, timer] = Classic(Env, Time, alg)
                 k(t) = F_UCB(mu,T,1/(Time)^2);
             case "TS"
                 k(t) = F_TS(S,F);
-            case "AdaUCB"
-                k(t) = F_AdaUCB(mu,T,Time);
         end
 
         end

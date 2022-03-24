@@ -1,6 +1,7 @@
-function [reward, regret, asympregret, k, timer] = Classic_2dim(Env1_1, Env1_2, Env2, Time, alg)
-    % HF: horizon free
-        K1 = length(Env1_1);    K2 = length(Env2);
+function [reward, regret, asympregret, k, timer] = Classic_2dim_alt(Env1, Env2, Time, alg)
+
+        Env = Env1'.*Env2;
+        K1 = length(Env1);    K2 = length(Env2);
         L = zeros(Time,2);  %L(1) = randi(K);
         mu = zeros(K1,K2);
         l = zeros(K1,K2);
@@ -20,8 +21,8 @@ function [reward, regret, asympregret, k, timer] = Classic_2dim(Env1_1, Env1_2, 
         k = [k; i j];
         t=t+1;
 
-        X = rand() < Env1_1(k(t,1));
-        Y = rand() < Env1_2(k(t,1))*Env2(k(t,2));
+        X = rand() < Env1(k(t,1));
+        Y = rand() < Env2(k(t,1),k(t,2));
         Z = X*Y;
 
         reward = [reward Z];
@@ -35,7 +36,7 @@ function [reward, regret, asympregret, k, timer] = Classic_2dim(Env1_1, Env1_2, 
         mu(k(t,1),k(t,2)) = (S(k(t,1),k(t,2)))./T(k(t,1),k(t,2));
 
         %% Compute regret
-        regret(t) = sum((max(Env1_1.*Env1_2)*max(Env2) - (Env1_1.*Env1_2)'.*Env2).*T, 'all');
+        regret(t) = sum((max(Env,[],'all') - Env).*T, 'all');
         %regret(t) = (t*max(Env1_1.*Env1_2)*max(Env2)) - sum(reward);
 
         end
@@ -48,16 +49,18 @@ function [reward, regret, asympregret, k, timer] = Classic_2dim(Env1_1, Env1_2, 
             case "KLUCB"
                 k_temp = F_KLUCB(mu(:),T(:),t);
             case "UCB"
-                k_temp = F_UCB(mu(:),T(:),1/(t)^2);
+                k_temp = F_UCB(mu(:),T(:),1/(Time)^2);
             case "TS"
                 k_temp = F_TS(S(:),F(:));
+            case "AdaUCB"
+                k_temp = F_AdaUCB(mu(:),T(:),Time);
         end
 
         [k(t,1),k(t,2)] = ind2sub([K1,K2],k_temp);
 
         % Observe the random outcome
-        X = rand() < Env1_1(k(t,1));
-        Y = rand() < Env1_2(k(t,1))*Env2(k(t,2));
+        X = rand() < Env1(k(t,1));
+        Y = rand() < Env2(k(t,1),k(t,2));
         Z = X*Y;
 
         %[ExpectedMeans, NbrPlayArm, gainKLUCB, ArmsPlayed]= UCB1_ReceiveReward(ExpectedMeans, NbrPlayArm, reward, ArmToPlay, gainKLUCB, ArmsPlayed); % Update UCB parameters using the reward received at time t.
@@ -75,9 +78,9 @@ function [reward, regret, asympregret, k, timer] = Classic_2dim(Env1_1, Env1_2, 
         timer = [timer tend];
 
         %% Compute Cumulative Regret
-        asympregret(t) = max(Env1_1.*Env1_2)*max(Env2) - Env1_1(k(t,1))*Env1_2(k(t,1))*Env2(k(t,2));
+        %asympregret(t) = max(Env1_1.*Env1_2)*max(Env2) - Env1_1(k(t,1))*Env1_2(k(t,1))*Env2(k(t,2));
 
-        regret(t) = sum((max(Env1_1.*Env1_2)*max(Env2) - (Env1_1.*Env1_2)'.*Env2).*T, 'all');
+        regret(t) = sum((max(Env,[],'all') - Env).*T, 'all');
 
     end
 

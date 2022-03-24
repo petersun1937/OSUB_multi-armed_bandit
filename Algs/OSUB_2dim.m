@@ -115,8 +115,7 @@ function [reward, regret, asympregret, k, timer] = OSUB_2dim(Env1_1, Env1_2, Env
                     k_temp = F_UCB(mu_N(:),T_N(:),1/(Time)^2);
                 case "TS"
                     k_temp = F_TS(S_N(:),F_N(:));
-                %case "AdaUCB"
-                    %k_temp = F_AdaUCB(mu_N(:),T_N(:),Time);
+
             end
             
             [k1,k2] = ind2sub([length(N1),length(N2)],k_temp);
@@ -137,7 +136,7 @@ function [reward, regret, asympregret, k, timer] = OSUB_2dim(Env1_1, Env1_2, Env
             case "KLUCB"
                 k_temp = F_KLUCB(mu_N(:),T_N(:),l(L(t,1),L(t,2)));
             case "UCB"
-                k_temp = F_UCB(mu_N(:),T_N(:),1/(Time)^2);
+                k_temp = F_UCB(mu_N(:),T_N(:),1/(t)^2);
             case "TS"
                 k_temp = F_TS(S_N(:),F_N(:));
             %case "AdaUCB"
@@ -171,7 +170,7 @@ function [reward, regret, asympregret, k, timer] = OSUB_2dim(Env1_1, Env1_2, Env
         tend = toc;
         timer = [timer tend];
         
-        
+
         %% Compute Regret
         asympregret(t) = max(Env1_1.*Env1_2)*max(Env2) - Env1_1(k(t,1))*Env1_2(k(t,1))*Env2(k(t,2));
         

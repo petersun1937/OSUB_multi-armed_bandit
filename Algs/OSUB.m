@@ -44,7 +44,7 @@ function [reward, regret, asympregret, k, timer] = OSUB(Env, gamma, Time, alg)
                     case "KLUCB"
                         k(t) = N(1)-1+F_KLUCB(mu(N),T(N),l(L(t)));
                     case "UCB"
-                        k(t) = N(1)-1+F_UCB(mu(N),T(N),1/(Time)^2);
+                        k(t) = N(1)-1+F_UCB(mu(N),T(N),1/(t)^2);
                     case "TS"
                         k(t) = N(1)-1+F_TS(S(N),F(N));
                     case "AdaUCB"

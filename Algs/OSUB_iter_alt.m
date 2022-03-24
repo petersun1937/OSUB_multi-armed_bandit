@@ -122,7 +122,7 @@ function [reward, regret, asympregret, i, timer] = OSUB_iter_alt(Env1_1, Env1_2,
             case "KLUCB"
                 i(t) = N2(1)-1+F_KLUCB(mu(L(t,1),N2),T(L(t,1),N2),l(L(t,1),L(t,2)));
             case "UCB"
-                i(t) = N2(1)-1+F_UCB(mu(L(t,1),N2),T(L(t,1),N2),1/(Time)^2);
+                i(t) = N2(1)-1+F_UCB(mu(L(t,1),N2),T(L(t,1),N2),1/(t)^2);
             case "TS"
                 i(t) = N2(1)-1+F_TS(S(L(t,1),N2),F(L(t,1),N2));
             end
@@ -135,7 +135,7 @@ function [reward, regret, asympregret, i, timer] = OSUB_iter_alt(Env1_1, Env1_2,
             case "KLUCB"
                 k(t) = F_KLUCB_2lv(mu1(:,L(t,2)),mu2(:,L(t,2)),T(:,L(t,2)),t);
             case "UCB"
-                k(t) = F_UCB_2lv(mu1(:,L(t,2)),mu2(:,L(t,2)),T(:,L(t,2)),1/(Time)^2);
+                k(t) = F_UCB_2lv(mu1(:,L(t,2)),mu2(:,L(t,2)),T(:,L(t,2)),1/(t)^2);
             case "TS"
                 k(t) = F_TS_2lv(S1(:,L(t,2)),S2(:,L(t,2)),F1(:,L(t,2)),F2(:,L(t,2)));
         end
