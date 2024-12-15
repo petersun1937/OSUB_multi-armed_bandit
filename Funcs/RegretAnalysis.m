@@ -3,7 +3,6 @@ function [regret_mean, rSTD, rCI95] = RegretAnalysis(Env,regret,Num_Trials)
 %Time = size(X,2);
 %K = length(Env);
 
-% Mean of cumulative regret throughout the trails
 regret_mean = mean(regret,1);
 
 % Standard deviation of the regret

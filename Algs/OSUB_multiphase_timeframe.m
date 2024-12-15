@@ -158,7 +158,7 @@ function [reward, regret, asympregret, d, timer] = OSUB_multiphase_timeframe(Env
                 case "KLUCB"
                     i(t) = N2(1)-1+F_KLUCB(mu2(k(t),N2),T(k(t),N2),l(k(t),L(t,2)));
                 case "UCB"
-                    i(t) = N2(1)-1+F_UCB(mu2(k(t),N2),T(k(t),N2),1/(t)^2);
+                    i(t) = N2(1)-1+F_UCB(mu2(k(t),N2),T(k(t),N2),1/(t));
                 case "TS"
                     i(t) = N2(1)-1+F_TS(S2(k(t),N2),F2(k(t),N2));
                 end

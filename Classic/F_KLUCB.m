@@ -1,6 +1,9 @@
 function [k,q] = F_KLUCB(p,s,n)
-    f = log(1 + n*log(log(n)))./s;
-    %f = (log(t) + c*log(log(t+1)))./s;
+    
+    f = log(1 + n*(log(n))^2)./s;
+    
+    %f = (log(n) + 3*log(log(n)))./s;
+    %f = (log(n) + 3*log(log(n2)))./s;
     
     %b_k = NaN(size(p));
     %b_k(~isnan(p)) = KLBinSearch(f(~isnan(p)),p(~isnan(p)));

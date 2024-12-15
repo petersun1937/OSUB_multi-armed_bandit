@@ -49,7 +49,7 @@ function [reward, regret, asympregret, k, timer] = Classic_2dim_alt(Env1, Env2, 
             case "KLUCB"
                 k_temp = F_KLUCB(mu(:),T(:),t);
             case "UCB"
-                k_temp = F_UCB(mu(:),T(:),1/(Time)^2);
+                k_temp = F_UCB(mu(:),T(:),1/t);
             case "TS"
                 k_temp = F_TS(S(:),F(:));
             case "AdaUCB"

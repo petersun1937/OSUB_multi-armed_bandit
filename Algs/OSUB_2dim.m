@@ -136,7 +136,7 @@ function [reward, regret, asympregret, k, timer] = OSUB_2dim(Env1_1, Env1_2, Env
             case "KLUCB"
                 k_temp = F_KLUCB(mu_N(:),T_N(:),l(L(t,1),L(t,2)));
             case "UCB"
-                k_temp = F_UCB(mu_N(:),T_N(:),1/(t)^2);
+                k_temp = F_UCB(mu_N(:),T_N(:),1/(t));
             case "TS"
                 k_temp = F_TS(S_N(:),F_N(:));
             %case "AdaUCB"

@@ -5,13 +5,16 @@ function [k,b_k] = F_KLUCB_2lv(p1,p2,s,n)
     
     b_k = KLBinSearch_2lv(f,p1,p2);
     
-    %b_k(p1.*p2==1) = 1; 
-    % Force select any arm that's not explored yet
+    b_k(p1.*p2==1) = 1; 
     b_k(s==0) = 1; 
     
+    %ArmToPlay = PickingMaxIndexArm(ucb);
     m = max(b_k);
-    % Randomly pick one of the max
-    mI = find(b_k == m);
-    k = mI(randi(length(mI)));
+    if ( ~isnan(m))
+        mI = find(b_k == m);
+        k = mI(randi(length(mI)));         % Randomly pick one of the max
+    else
+        k = randi(K);
+    end
 
 end

@@ -11,13 +11,14 @@ ylabel('Cumulative regret')
 legend(Alg)
 %}
 % Plot Standard Deviation of all experiments
+%{
 figure
 plot(std,'k', 'LineWidth',1.5);
 grid on
 xlabel('Time slot')
 ylabel('Standard Deviation')
 legend(Alg)
-
+%}
 % Plot 95% Confidence Intervals of all experiments
 figure
 plot(mean(regret,1),'k', 'LineWidth',1.5);

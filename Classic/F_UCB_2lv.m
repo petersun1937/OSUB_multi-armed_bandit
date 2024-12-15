@@ -1,11 +1,14 @@
-function [k,w] = F_UCB_2lv(mu1,mu2,T,delta)
+function [k,f] = F_UCB_2lv(mu1,mu2,T,delta)
     
-    w = mu1.*mu2+sqrt((2./T).*log(1/delta));
-    m = max(w);
-    
+    f = mu1.*mu2+sqrt((2./T).*log(1/delta));
+    m = max(f);
     % Randomly pick one of the max-valued arm
-    mI = find(w == m);
+    if ( ~isnan(m))
+    mI = find(f == m);
     k = mI(randi(length(mI)));
+    else
+    k = randi(length(mu));
+    end
         
         
 end

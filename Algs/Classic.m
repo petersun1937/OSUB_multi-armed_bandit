@@ -1,4 +1,4 @@
-function [reward, regret, asympregret, k, timer] = Classic(Env, Time, alg)
+function [reward, regret, T_path, k, timer] = Classic(Env, Time, alg)
 
     K = length(Env);
     mu = zeros(1,K);
@@ -6,8 +6,9 @@ function [reward, regret, asympregret, k, timer] = Classic(Env, Time, alg)
     T = zeros(1,K);  S = zeros(1,K);    F = zeros(1,K);
     reward = [];    %SelectedArm = [];
     regret = zeros(1,Time);
-    asympregret = zeros(1,Time);
-
+    %asympregret = zeros(1,Time);
+    
+    T_path = [];
     timer = [];         % timer
     
     
@@ -27,7 +28,7 @@ function [reward, regret, asympregret, k, timer] = Classic(Env, Time, alg)
             case "KLUCB"
                 k(t) = F_KLUCB(mu,T,t);
             case "UCB"
-                k(t) = F_UCB(mu,T,1/(Time)^2);
+                k(t) = F_UCB(mu,T,1/t);
             case "TS"
                 k(t) = F_TS(S,F);
         end
@@ -56,40 +57,14 @@ function [reward, regret, asympregret, k, timer] = Classic(Env, Time, alg)
         tend = toc;
         timer = [timer tend];
         
+        T_path = [T_path T(2)];
+        
         %% Compute Cumulative Regret
-        regret(t) = sum((max(Env) - Env).*T);
+        regret(t) = sum((max(Env,[],'all') - Env)'.*T, 'all');
         %regret(t) = t*max(Env) - sum(reward);
         
-        asympregret(t) =(max(Env) - Env(k(t)));
+        %asympregret(t) =(max(Env) - Env(k(t)));
         
-        %{
-        if t>1
-            %regret(t) = regret(t-1) + (max(Env) - Env(k(t))); 
-            %regret(t) = (regret(t-1) + (max(Env) - mean(reward,2)));
-            
-        else
-            %regret(1) = max(Env) - Env(k(t));
-            %regret(t) = max(Env) - mean(reward,2);
-            
-        end
-        %}
-        
-
-        
-        %{
-        Z_opt = rand() < Env(k_opt);
-        S_opt = S_opt + Z_opt;
-        
-        mu_opt = S_opt/t;
-        %mu_emp = S/t;
-        if t>1
-            %regret(t) = regret(t-1) + sum((mu_opt - mu_emp).*T_exp);
-            regret(t) = regret(t-1) + (mu_opt - mean(reward,2));
-        else
-            %regret(1) = sum((mu_opt - mu_emp).*T_exp);
-            regret(t) = mu_opt - mean(reward,2);
-        end
-        %}
         
     end
     

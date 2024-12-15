@@ -5,14 +5,14 @@ addpath('Funcs')
 
 %% Sim Setup
 
-% Choose one environment(ground truth) setup
-setup = "sim7";
+% Choose one environment(ground truth) setup and parameters
+setup = "sim4";
 
 n = 30e3;               % Time horizon
-Num_Trials = 30;        % # trials to run
-frame = 0.5e3;        % Frame size
+Num_Trials = 50;        % Num of trials to run
+frame = 0.1e3;        % Frame size
 
-% Choose the classic algorithms (UCB, KLUCB, TS)
+% Choose the decision algorithms (UCB, KLUCB, TS)
 Algs = ["UCB"];
 %Algs = ["UCB" "KLUCB" "TS"];
 
@@ -20,13 +20,23 @@ Num_Algs = numel(Algs);
 
 switch setup
     case 'anl1'
-        PredProb = [0.01 0.5 0.8 ];
-        TranProbr = [0.99 0.85 0.8];
+        PredProb = [0.9 0.8];
+        TranProbr = [1 0.5];
         
-        TranProbb = [0.1:0.4:0.9 0.5:-0.4:0.1];
+        TranProbb = [1 0.5];
         
         TransProb = TranProbr'.*TranProbb;
         AvgThruput = (PredProb.*TranProbr)'.*TranProbb;
+        
+    case 'anl2'
+        PredProb = [0.9 0.8];
+        TranProbr = [1 0.5];
+        
+        TranProbb = [1 0.8 0.5];
+        
+        TransProb = TranProbr'.*TranProbb;
+        AvgThruput = (PredProb.*TranProbr)'.*TranProbb;
+        
     case 'sim1'
         % 1st setup
         Rate = [2 3 5 6 9];
@@ -54,14 +64,14 @@ switch setup
         TransProb = TranProbr'.*TranProbb;
         AvgThruput = (PredProb.*TranProbr)'.*TranProbb;
     case 'sim4'
-       % 4th setup (vertically not unimodal)
+       % 4th setup (not unimodal)
         Rate = [2 3 5 6 8]; 
         
-        PredProb = [0.15 0.3 0.45 0.6 0.75];
-        TranProbr = [0.99 0.8 0.5 0.38 0.2];
+        PredProb = [0.1 0.2 0.6 0.8 0.9];
+        TranProbr = [0.99 0.8 0.75 0.65 0.5];
         
         Beam = [1 2 3 4 5 6 7 8 9];
-        TranProbb = [0.1:0.2:0.9 0.7:-0.2:0.1];
+        TranProbb = [0.1 0.2 0.7 0.9 0.99 0.7 0.6 0.8 0.6];
         
         TransProb = TranProbr'.*TranProbb;
         AvgThruput = (PredProb.*TranProbr)'.*TranProbb;
@@ -70,11 +80,11 @@ switch setup
        % 5th setup (vertically not unimodal)
         Rate = [2 3 5 6 8]; 
         
-        PredProb = [0.15 0.3 0.45 0.6 0.75];
-        TranProbr = [0.99 0.8 0.4 0.35 0.2];
+        PredProb = [0.35 0.4 0.55 0.9 0.99];
+        TranProbr = [0.99 0.8 0.7 0.5 0.4];
         
         Beam = [1 2 3 4 5 6 7 8 9];
-        TranProbb = [0.1:0.2:0.9 0.7:-0.2:0.1];
+        TranProbb = [0.1 0.2 0.4 0.7 0.99 0.7 0.4 0.2 0.1];
         
         TransProb = TranProbr'.*TranProbb;
         AvgThruput = (PredProb.*TranProbr)'.*TranProbb;
@@ -147,12 +157,14 @@ SelectedArms       = cell(Num_Trials,Num_Algs);
 reward  = cell(1,Num_Algs);
 
 regret = cell(1,Num_Algs);
-
+T_paths = cell(1,Num_Algs); T_paths2 = cell(1,Num_Algs);
+fixedbeams = cell(1,Num_Algs);
+[K,~]=size(AvgThruput);
 
 %% Run Num_Trials times
 for trial = 1:Num_Trials
     disp(trial)
-    for alg = 1:Num_Algs
+    for alg = 1:Num_Algs        % Run each algorithm
         
     disp(Algs(alg))
 
@@ -160,15 +172,23 @@ for trial = 1:Num_Trials
     %[X, reg, ~, Arm, timer] = OSUB_2dim_alt(PredProb, TransProb, 2, n, Algs(alg));
 
     %% OSUB-two-level
-    %[X, reg, ~, Arm, timer] = OSUB_2dim_2lv(PredProb, TranProbr, TranProbb, 4, n, Algs(alg));
+    %[X, reg, ~, Arm, timer] = OSUB_2dim(PredProb, TranProbr, TranProbb, 4, n, Algs(alg));
     
     %% Timeframe
     %[X, reg, ~, Arm, timer] = OSUB_multiphase_timeframe(PredProb, TransProb, 2, n, Algs(alg), frame, 100);
     
-    [X, reg, ~, Arm, timer] = Voting_timeframe(PredProb, TransProb, n, Algs(alg), frame);
+    [X, reg, T_path, T_path2, Arm, timer, fixedb] = Voting_timeframe(PredProb, TransProb, n, Algs(alg), frame);
+    
+    n1=ceil(frame/(K*2)); % phase 1 within frame
+    %[X, reg, ~, ~, Arm, timer, fixedb] = Explr_timeframe(PredProb, TransProb, n, Algs(alg), frame, n1 );
+    n1=ceil(n/frame/2); % phase 1 across frames
+    %[X, reg, ~, ~, Arm, timer, fixedb] = Explr2_timeframe(PredProb, TransProb, n, Algs(alg), frame, n1 );
+    
+    % Arm Elimination
+    %[X, reg, ~, ~, Arm, timer, fixedb] = Explr_ArmElim_timeframe(PredProb, TransProb, n, Algs(alg), frame);
     
     %% Classic
-    %[X, reg, ~, Arm, timer] = Classic_2dim_alt(PredProb, TransProb, n, Algs(alg));
+    %[X, reg, T_path, Arm, timer] = Classic_2dim(PredProb, TransProb, n, Algs(alg));
    
     %% Update records
     SelectedArms{trial,alg} = Arm;
@@ -178,6 +198,14 @@ for trial = 1:Num_Trials
     % Cumulative regret
     regret{alg}       = [regret{alg}; reg];  
     
+    
+    %fixedbeams{alg}  = [fixedbeams{alg} fixedb];
+    
+    %if exist('T_paths','var')
+        %T_paths{alg}       = [T_paths{alg}; T_path]; 
+        %T_paths2{alg}       = [T_paths2{alg}; T_path2]; 
+   % end
+    
     end
 
 end
@@ -185,8 +213,22 @@ end
 
 %% Compute and plot regret and statistics
 CI95 = cell(alg,1);
+
 for alg = 1:Num_Algs
     [cumreg(alg,:), std(alg,:), CI95{alg}] = RegretAnalysis([], regret{alg}, Num_Trials);
+    
+    %figure
+    %plot(mean(T_paths{alg},1),'k', 'LineWidth',1.5);
+    %plot(T_paths{alg}(1,:),'k', 'LineWidth',1.5);
+    %grid on
+    %{
+    xlabel('Time slot')
+    ylabel('T paths')
+    hold on
+    plot(mean(T_paths2{alg},1),'b', 'LineWidth',1.5);
+    %plot(T_paths2{alg}(1,:),'b', 'LineWidth',1.5);
+    hold off
+    %}
 end
 %save("result.mat")
 
@@ -201,3 +243,5 @@ switch Num_Algs
         PlotRegret3(cumreg(1,:),cumreg(2,:),cumreg(3,:),std(1,:),std(2,:),std(3,:),...
            CI95{1},CI95{2},CI95{3},Algs(1), Algs(2), Algs(3))
 end
+
+
